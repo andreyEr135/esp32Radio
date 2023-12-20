@@ -1,10 +1,11 @@
 #include "globals.h"
 
 // StationInfo structure and variables
+listOfStations *listStations;
 int currentStation = 0;
-extern int countOfStations = 0;
-_stationInfo stationInfo;
-struct _stationInfo stationsInfo[MAX_STATIONS];
+// extern int countOfStations = 0;
+// _stationInfo stationInfo;
+// struct _stationInfo stationsInfo[MAX_STATIONS];
 
 // Create Audio objects
 Audio audio;
@@ -12,12 +13,6 @@ Audio audio;
 // WiFi settings
 String ssid;
 String password;
-
-// ConfigFile JSON
-DynamicJsonDocument config(1000);
-
-// SPI
-SPIClass hspi;
 
 // LGFX
 LGFX tft;

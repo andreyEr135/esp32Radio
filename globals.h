@@ -5,12 +5,14 @@
 #include <string>
 
 #include <Arduino.h>
-#include <ArduinoJson.h>
 #include "Audio.h"
-#include <SPI.h>
 #include <LovyanGFX.hpp>
 #include "lvgl.h"
 #include <lvgl.h>
+
+#include "listOfStations.h"
+
+#define TIMEOUT_WIFI_CONNECT 10
 
 
 #define VALUE_MAX_LENGTH 255
@@ -36,16 +38,18 @@
 #define screenHeight 320
 
 // StationInfo structure and variables
+class listOfStations;
+extern listOfStations *listStations;
 extern int currentStation;
-extern int countOfStations;
+// extern int countOfStations;
 
-struct _stationInfo {
-  String name;
-  String url;
-};
-extern _stationInfo stationInfo;
-// StationsInfo list
-extern struct _stationInfo stationsInfo[MAX_STATIONS];
+// struct _stationInfo {
+//   String name;
+//   String url;
+// };
+// extern _stationInfo stationInfo;
+// // StationsInfo list
+// extern struct _stationInfo stationsInfo[MAX_STATIONS];
 
 // Create Audio objects
 extern Audio audio;
@@ -53,12 +57,6 @@ extern Audio audio;
 // WiFi settings
 extern String ssid;
 extern String password;
-
-// ConfigFile JSON
-extern DynamicJsonDocument config;
-
-// HSPI
-extern SPIClass hspi;
 
 // LGFX
 class LGFX : public lgfx::LGFX_Device

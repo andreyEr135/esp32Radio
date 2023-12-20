@@ -6,63 +6,19 @@
 #include "Audio.h"
 #include "globals.h"
 
-#include "SD.h"
-#include "FS.h"
 #include "lvgl.h"
-#include <ArduinoJson.h>
-#include <SPI.h>
 
 // Create an instance of the prepared class
 #include <lvgl.h>
+
+#include "sdConfig.h"
+//#include "listOfStations.h"
 
 
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t buf[screenWidth * 10];
 
-
-
-
-/* READ CONFIG JSON */
-bool readConfig(){
-  File dataFile = SD.open("/config.json");
-  DeserializationError error = deserializeJson(config, dataFile);
-
-  if (error) {
-    Serial.print(F("deserializeJson() failed: "));
-    Serial.println(error.f_str());
-    return false;
-  }
-
-  /* READ SSID */
-  const char* _ssid = config["ssid"];
-  ssid = String(_ssid);
-
-  /* READ PASSWORD */
-  const char* _password = config["password"];
-  password = String(_password);
-
-  /* READ STATIONS-LIST */
-  countOfStations = atoi(config["stations"]["count"]);
-  for (int i = 0; i < countOfStations; i++)
-  {
-    char stationStr[255]; memset(stationStr, 0, sizeof(stationStr));
-    sprintf(stationStr, "station%d", i);   
-    
-    _stationInfo station;
-    const char* _str = config["stations"][stationStr]["name"];
-    station.name = (String)_str;
-    _str = config["stations"][stationStr]["path"];
-    station.url = (String)_str;    
-    stationsInfo[i] = station;
-  }   
-    
-
-  return true;
-}
-
-
-
-
+sdConfig *readConfig;
 
 
 static lv_obj_t *labelStationName;
@@ -91,14 +47,6 @@ static lv_obj_t *volOffBtn;
 static lv_obj_t *label;
 static lv_obj_t *slider;
 
-
-
-int getIdOfStation(const char* name)
-{
-  for (int i = 0; i < countOfStations; i++)
-    if (strcmp(stationsInfo[i].name.c_str(), name) == 0) return i;
-  return 0;
-}
 
 void HideListOfStations()
 {
@@ -150,9 +98,10 @@ static void eventListClickedHandler(lv_event_t * e)
   lv_event_code_t code = lv_event_get_code(e);
   lv_obj_t * btn = lv_event_get_target(e);
   if(code == LV_EVENT_CLICKED) {
-    currentStation = getIdOfStation(lv_list_get_btn_text(listOfStations, btn));
-    write_stationName(stationsInfo[currentStation].name.c_str());
-    audio.connecttohost(stationsInfo[currentStation].url.c_str());    
+    currentStation = listStations->getIdOfStation((String)lv_list_get_btn_text(listOfStations, btn));
+    write_stationName(listStations->getNameOfStations(currentStation)).c_str());
+    audio.connecttohost(listStations->getUrlOfStation((String)lv_list_get_btn_text(listOfStations, btn)));
+    //audio.connecttohost(stationsInfo[currentStation].url.c_str());    
     HideListOfStations();
   }
 }
@@ -178,9 +127,10 @@ void CreateListOfStations()
   
   lv_obj_t *list_btn;
 
-  for (int i = 0; i < countOfStations; i++)
+  for (int i = 0; i < listStations->getCountOfStations(); i++)
   {
-    list_btn = lv_list_add_btn(listOfStations, NULL, stationsInfo[i].name.c_str());
+    list_btn = lv_list_add_btn(listOfStations, NULL, listStations->getNameOfStations(i).c_str());
+    //list_btn = lv_list_add_btn(listOfStations, NULL, stationsInfo[i].name.c_str());
     lv_obj_add_event_cb(list_btn, eventListClickedHandler, LV_EVENT_CLICKED, NULL);
   }
   listDisplay = true;
@@ -231,8 +181,9 @@ static void eventPrevStationBtn(lv_event_t * e)
     if(code == LV_EVENT_CLICKED) {
       currentStation--;
       if (currentStation < 0) currentStation = countOfStations - 1;
-      write_stationName(stationsInfo[currentStation].name.c_str());
-      audio.connecttohost(stationsInfo[currentStation].url.c_str()); 
+      write_stationName(listStations->getNameOfStations(currentStation)).c_str());
+      audio.connecttohost(listStations->getUrlOfStation(listStations->getNameOfStations(currentStation)).c_str());
+      //audio.connecttohost(stationsInfo[currentStation].url.c_str()); 
     }
 }
 
@@ -242,8 +193,9 @@ static void eventNextStationBtn(lv_event_t * e)
     if(code == LV_EVENT_CLICKED) {
       currentStation++;
       if (currentStation > countOfStations - 1) currentStation = 0;
-      audio.connecttohost(stationsInfo[currentStation].url.c_str()); 
-      write_stationName(stationsInfo[currentStation].name.c_str());
+      audio.connecttohost(listStations->getUrlOfStation(listStations->getNameOfStations(currentStation)).c_str());
+      //audio.connecttohost(stationsInfo[currentStation].url.c_str()); 
+      write_stationName(listStations->getNameOfStations(currentStation)).c_str());
     }
 }
 
@@ -572,9 +524,9 @@ void write_title(const char *sName)
   lv_label_set_text_fmt(labelTitle, "%s", sName);
 }
 
-void setup() {
-  hspi.begin(SD_CLK_PIN, SD_MISO_PIN, SD_MOSI_PIN, SD_CS_PIN);  //hspi defined in wt32_sc01_plus.h
- 
+
+void displaySetup()
+{
   tft.begin();
   tft.setRotation(3);
   tft.setBrightness(255);
@@ -593,48 +545,69 @@ void setup() {
   indev_drv.type = LV_INDEV_TYPE_POINTER;
   indev_drv.read_cb = my_touch_read;
   lv_indev_drv_register(&indev_drv);  
+}
 
-  volumeOut = 10;
-
+void audioSetup()
+{
   audio.setPinout(I2S_BCLK, I2S_LRCK, I2S_DOUT);
-  audio.setVolume(volumeOut);                                                   // Values from 0 to 21
+  audio.setVolume(volumeOut);    // Values from 0 to 21
+}
 
-  CreateControls();
-
-  if(!SD.begin(SD_CS_PIN, hspi, SD_SPI_FREQ)){
-    return;
-  } else 
-  {
-    uint8_t cardType = SD.cardType();
-    if(cardType == CARD_NONE){
-      audio_showstation("No SD card attached");
-    }
-    else 
-    {
-      uint64_t cardSize = SD.cardSize() / (1024 * 1024);
-
-      if(!readConfig()) {       // READ SSID; PASSWORD AND STATIONS
-        audio_showstation("error opening config.json");
-      }
-
-    }
-  }
-  
-
-
+bool wifiSetup()
+{
   WiFi.disconnect();
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid.c_str(), password.c_str());
-  while (WiFi.status() != WL_CONNECTED) delay(1500);  
-  
+  int t_sec = 0;
+  while (WiFi.status() != WL_CONNECTED) 
+  {
+    t_sec++;
+    if (t_sec > TIMEOUT_WIFI_CONNECT)
+    {
+      if (WiFi.status() != WL_CONNECTED)
+      {
+        audio_showstation("Connect to WiFi error");
+        audio_showstreamtitle(ssid.c_str());
+        return false;
+      }
+    }
+    delay(1000);
+  }  
+  audio_showstation("Connected to WiFi");
+  return true;
+}
 
-  if (countOfStations > 0)
+
+void setup() {
+  readConfig = new sdConfig();
+  listStations = new listOfStations();
+ 
+  displaySetup();
+ 
+  volumeOut = 10;
+
+  audioSetup();
+
+  CreateControls();
+
+  if (!readConfig->readConfig())
   {
-    currentStation = 0;
-    audio.connecttohost(stationsInfo[currentStation].url.c_str());
-  }  else
+    audio_showstation("Read config from SD card error");
+    audio_showstreamtitle(readConfig->GetError().c_str());
+    return;
+  }
+  
+  if (wifiSetup())  
   {
-    audio_showstation("Radio Stations not found!");
+    if (listStations->getCountOfStations() > 0)
+    {
+      currentStation = 0;
+      audio.connecttohost(listStations->getUrlOfStation(listStations->getNameOfStations(currentStation)).c_str());
+      //audio.connecttohost(stationsInfo[currentStation].url.c_str());
+    }  else
+    {
+      audio_showstation("Radio Stations not found!");
+    }
   }
 
   delay(500); 
