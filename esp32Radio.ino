@@ -12,7 +12,7 @@
 #include <lvgl.h>
 
 #include "sdConfig.h"
-//#include "listOfStations.h"
+#include "listOfStations.h"
 
 
 static lv_disp_draw_buf_t draw_buf;
@@ -38,7 +38,7 @@ bool listDisplay = false;
 int timeOutStationList;
 static lv_obj_t *pageStationsList;
 static lv_obj_t *labelListTitle;
-static lv_obj_t *listOfStations;
+static lv_obj_t *menuOfStations;
 
 static lv_obj_t *volOffBtn; 
 
@@ -48,13 +48,13 @@ static lv_obj_t *label;
 static lv_obj_t *slider;
 
 
-void HideListOfStations()
+void HideMenuOfStations()
 {
   lv_obj_del(labelListTitle);
-  lv_obj_del(listOfStations);
+  lv_obj_del(menuOfStations);
   lv_obj_del(pageStationsList);
   labelListTitle = NULL;
-  listOfStations = NULL;
+  menuOfStations = NULL;
   pageStationsList = NULL;
   listDisplay = false;
 }
@@ -82,7 +82,7 @@ void tickTimer(lv_timer_t * timer)
   }
   if ((listDisplay) && (timeOutStationList > 10))
   {
-    HideListOfStations();
+    HideMenuOfStations();
     timeOutStationList = 0;    
     return;
   }
@@ -98,15 +98,15 @@ static void eventListClickedHandler(lv_event_t * e)
   lv_event_code_t code = lv_event_get_code(e);
   lv_obj_t * btn = lv_event_get_target(e);
   if(code == LV_EVENT_CLICKED) {
-    currentStation = listStations->getIdOfStation((String)lv_list_get_btn_text(listOfStations, btn));
-    write_stationName(listStations->getNameOfStations(currentStation)).c_str());
-    audio.connecttohost(listStations->getUrlOfStation((String)lv_list_get_btn_text(listOfStations, btn)));
+    currentStation = listStations->getIdOfStation((String)lv_list_get_btn_text(menuOfStations, btn));
+    write_stationName(listStations->getNameOfStations(currentStation).c_str());
+    audio.connecttohost(listStations->getUrlOfStation((String)lv_list_get_btn_text(menuOfStations, btn)).c_str());
     //audio.connecttohost(stationsInfo[currentStation].url.c_str());    
-    HideListOfStations();
+    HideMenuOfStations();
   }
 }
 
-void CreateListOfStations()
+void CreateMenuOfStations()
 {
   /* Create page of list stations */
   pageStationsList = lv_obj_create(lv_scr_act()); /*Create a parent object on the current screen*/
@@ -121,16 +121,16 @@ void CreateListOfStations()
   lv_obj_set_pos(labelListTitle, 120, 0);
   lv_obj_add_style(labelListTitle, &stLabelStyle, LV_PART_MAIN);
 
-  listOfStations = lv_list_create(pageStationsList);
-  lv_obj_set_size(listOfStations, 355, 220);
-  lv_obj_set_pos(listOfStations, 0, 35);
+  menuOfStations = lv_list_create(pageStationsList);
+  lv_obj_set_size(menuOfStations, 355, 220);
+  lv_obj_set_pos(menuOfStations, 0, 35);
   
   lv_obj_t *list_btn;
 
   for (int i = 0; i < listStations->getCountOfStations(); i++)
   {
-    list_btn = lv_list_add_btn(listOfStations, NULL, listStations->getNameOfStations(i).c_str());
-    //list_btn = lv_list_add_btn(listOfStations, NULL, stationsInfo[i].name.c_str());
+    list_btn = lv_list_add_btn(menuOfStations, NULL, listStations->getNameOfStations(i).c_str());
+    //list_btn = lv_list_add_btn(menuOfStations, NULL, stationsInfo[i].name.c_str());
     lv_obj_add_event_cb(list_btn, eventListClickedHandler, LV_EVENT_CLICKED, NULL);
   }
   listDisplay = true;
@@ -180,8 +180,8 @@ static void eventPrevStationBtn(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     if(code == LV_EVENT_CLICKED) {
       currentStation--;
-      if (currentStation < 0) currentStation = countOfStations - 1;
-      write_stationName(listStations->getNameOfStations(currentStation)).c_str());
+      if (currentStation < 0) currentStation = listStations->getCountOfStations() - 1;
+      write_stationName(listStations->getNameOfStations(currentStation).c_str());
       audio.connecttohost(listStations->getUrlOfStation(listStations->getNameOfStations(currentStation)).c_str());
       //audio.connecttohost(stationsInfo[currentStation].url.c_str()); 
     }
@@ -192,10 +192,10 @@ static void eventNextStationBtn(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     if(code == LV_EVENT_CLICKED) {
       currentStation++;
-      if (currentStation > countOfStations - 1) currentStation = 0;
+      if (currentStation > listStations->getCountOfStations() - 1) currentStation = 0;
       audio.connecttohost(listStations->getUrlOfStation(listStations->getNameOfStations(currentStation)).c_str());
       //audio.connecttohost(stationsInfo[currentStation].url.c_str()); 
-      write_stationName(listStations->getNameOfStations(currentStation)).c_str());
+      write_stationName(listStations->getNameOfStations(currentStation).c_str());
     }
 }
 
@@ -232,13 +232,13 @@ static void eventMenuBtn(lv_event_t * e)
     if(code == LV_EVENT_CLICKED) {
       if (!listDisplay) {
         if (volDisplay) HideVolume();
-        CreateListOfStations();
+        CreateMenuOfStations();
         lv_timer_reset(volTimer);
         lv_timer_resume(volTimer);        
       }
       else 
       {
-        HideListOfStations();
+        HideMenuOfStations();
         lv_timer_pause(volTimer);
       }
     }
@@ -263,7 +263,7 @@ static void eventVolBtn(lv_event_t * e)
           lv_timer_pause(volTimer);
         } else
         {
-          if (listDisplay) HideListOfStations();
+          if (listDisplay) HideMenuOfStations();
           /* Create page of volume */
           pageVolume = lv_obj_create(lv_scr_act()); /*Create a parent object on the current screen*/
           lv_obj_set_size(pageVolume, 300, 90);

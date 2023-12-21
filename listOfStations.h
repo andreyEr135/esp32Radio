@@ -6,7 +6,7 @@
 
 #include <Arduino.h>
 
-#include "globals.h"
+#define MAX_STATIONS 32
 
 class listOfStations
 {
@@ -26,7 +26,7 @@ class listOfStations
       String name;
       String url;
     };
-    struct _stationInfo stationsInfo[32];
+    struct _stationInfo stationsInfo[MAX_STATIONS];
 
   
 };

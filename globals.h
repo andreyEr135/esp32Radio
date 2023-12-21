@@ -12,7 +12,9 @@
 
 #include "listOfStations.h"
 
-#define TIMEOUT_WIFI_CONNECT 10
+#define TIMEOUT_WIFI_CONNECT     10
+#define TIMEOUT_VOLUME_PAGE      10
+#define TIMEOUT_STATIONLIST_PAGE 10
 
 
 #define VALUE_MAX_LENGTH 255
@@ -41,15 +43,6 @@
 class listOfStations;
 extern listOfStations *listStations;
 extern int currentStation;
-// extern int countOfStations;
-
-// struct _stationInfo {
-//   String name;
-//   String url;
-// };
-// extern _stationInfo stationInfo;
-// // StationsInfo list
-// extern struct _stationInfo stationsInfo[MAX_STATIONS];
 
 // Create Audio objects
 extern Audio audio;
