@@ -13,39 +13,13 @@
 
 #include "sdConfig.h"
 #include "listOfStations.h"
+#include "uiModules.h"
 
 
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t buf[screenWidth * 10];
 
 sdConfig *readConfig;
-
-
-static lv_obj_t *labelStationName;
-static lv_obj_t *labelTitle;
-
-TaskHandle_t volumeDispTask;
-lv_timer_t *volTimer;
-bool volDisplay = false;
-int timeOutVolume;
-static lv_obj_t *pageVolume;
-static lv_style_t stVolLabelStyle;
-static lv_obj_t *labelMainVolume;
-lv_obj_t *iconPlayPause;
-
-
-bool listDisplay = false;
-int timeOutStationList;
-static lv_obj_t *pageStationsList;
-static lv_obj_t *labelListTitle;
-static lv_obj_t *menuOfStations;
-
-static lv_obj_t *volOffBtn; 
-
-
-
-static lv_obj_t *label;
-static lv_obj_t *slider;
 
 
 void HideMenuOfStations()
@@ -61,33 +35,59 @@ void HideMenuOfStations()
 
 void HideVolume()
 {
-  lv_obj_del(slider);
-  lv_obj_del(label);
+  lv_obj_del(sliderVolume);
+  lv_obj_del(labelVolumeTitle);
   lv_obj_del(pageVolume);
-  slider = NULL;
-  label = NULL;
+  sliderVolume = NULL;
+  labelVolumeTitle = NULL;
   pageVolume = NULL;
   volDisplay = false;
+}
+
+void playPauseBtnChangeState(bool played)
+{
+  LV_IMG_DECLARE(playBtn);
+  LV_IMG_DECLARE(pauseBtn);
+  LV_IMG_DECLARE(playIcon);
+  LV_IMG_DECLARE(pauseIcon);
+    
+  if (audioPlaying != played)
+  {
+    if (played)
+    {
+      lv_imgbtn_set_src(playPauseBtn, LV_IMGBTN_STATE_RELEASED, NULL, &pauseBtn, NULL);
+      lv_img_set_src(iconPlayPause, &playIcon);
+      lv_obj_set_pos(iconPlayPause, 14, 120);
+    }
+    else
+    {
+      lv_imgbtn_set_src(playPauseBtn, LV_IMGBTN_STATE_RELEASED, NULL, &playBtn, NULL);
+      lv_img_set_src(iconPlayPause, &pauseIcon);
+      lv_obj_set_pos(iconPlayPause, 26, 115);
+    }
+    audioPlaying = played;      
+  }
 }
 
 
 void tickTimer(lv_timer_t * timer)
 {
-  if ((volDisplay) && (timeOutVolume > 10))
+  if ((volDisplay) && (tickVolume > TIMEOUT_VOLUME_PAGE))
   {
     HideVolume();
-    timeOutVolume = 0;
-    lv_timer_pause(volTimer);
+    tickVolume = 0;
     return;
   }
-  if ((listDisplay) && (timeOutStationList > 10))
+  if ((listDisplay) && (tickStationList > TIMEOUT_STATIONLIST_PAGE))
   {
     HideMenuOfStations();
-    timeOutStationList = 0;    
+    tickStationList = 0;    
     return;
   }
-  if (volDisplay) timeOutVolume++;
-  if (listDisplay) timeOutStationList++;
+  if (volDisplay) tickVolume++;
+  if (listDisplay) tickStationList++;
+
+  playPauseBtnChangeState(audio.isRunning());
 }
 
 
@@ -100,8 +100,7 @@ static void eventListClickedHandler(lv_event_t * e)
   if(code == LV_EVENT_CLICKED) {
     currentStation = listStations->getIdOfStation((String)lv_list_get_btn_text(menuOfStations, btn));
     write_stationName(listStations->getNameOfStations(currentStation).c_str());
-    audio.connecttohost(listStations->getUrlOfStation((String)lv_list_get_btn_text(menuOfStations, btn)).c_str());
-    //audio.connecttohost(stationsInfo[currentStation].url.c_str());    
+    audio.connecttohost(listStations->getUrlOfStation((String)lv_list_get_btn_text(menuOfStations, btn)).c_str());   
     HideMenuOfStations();
   }
 }
@@ -130,22 +129,45 @@ void CreateMenuOfStations()
   for (int i = 0; i < listStations->getCountOfStations(); i++)
   {
     list_btn = lv_list_add_btn(menuOfStations, NULL, listStations->getNameOfStations(i).c_str());
-    //list_btn = lv_list_add_btn(menuOfStations, NULL, stationsInfo[i].name.c_str());
     lv_obj_add_event_cb(list_btn, eventListClickedHandler, LV_EVENT_CLICKED, NULL);
   }
   listDisplay = true;
 }
 
+void CreateVolumePage()
+{
+  pageVolume = lv_obj_create(lv_scr_act()); /*Create a parent object on the current screen*/
+  lv_obj_set_size(pageVolume, 300, 90);
+  lv_obj_align(pageVolume, LV_ALIGN_CENTER, 0, 0);
+
+  sliderVolume = lv_slider_create(pageVolume);
+  lv_obj_set_width(sliderVolume, 210);                                              // Set the width
+  lv_obj_center(sliderVolume);                                                      // Align to the center of the parent (screen)
+  lv_slider_set_range(sliderVolume, 0, 21);
+  lv_slider_set_value(sliderVolume, volumeOut, LV_ANIM_ON);
+  lv_obj_add_event_cb(sliderVolume, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL); // Assign an event function
+
+  // Create a label above the slider
+  static lv_style_t stVolPageLabelStyle;
+  lv_style_init(&stVolPageLabelStyle);
+  lv_style_set_text_font(&stVolPageLabelStyle, &lv_font_montserrat_18);
+
+  labelVolumeTitle = lv_label_create(pageVolume);
+  lv_obj_add_style(labelVolumeTitle, &stVolPageLabelStyle, LV_PART_MAIN);
+  lv_label_set_text_fmt(labelVolumeTitle, "Volume %" LV_PRId32, lv_slider_get_value(sliderVolume));
+  lv_obj_align_to(labelVolumeTitle, sliderVolume, LV_ALIGN_OUT_TOP_MID, 0, -15); // Align top of the slider
+  volDisplay = true;
+}
 
 
 static void slider_event_cb(lv_event_t *e)
 {
   LV_IMG_DECLARE(vol_off);
   LV_IMG_DECLARE(vol_offed);
-  timeOutVolume = 0;
+  tickVolume = 0;
   // Refresh the text
-  lv_label_set_text_fmt(label, "Volume %" LV_PRId32, lv_slider_get_value(slider));
-  volumeOut = lv_slider_get_value(slider);
+  lv_label_set_text_fmt(labelVolumeTitle, "Volume %" LV_PRId32, lv_slider_get_value(sliderVolume));
+  volumeOut = lv_slider_get_value(sliderVolume);
   lv_label_set_text_fmt(labelMainVolume, "Vol  %d", volumeOut);
   audio.setVolume(volumeOut);
 
@@ -194,7 +216,6 @@ static void eventNextStationBtn(lv_event_t * e)
       currentStation++;
       if (currentStation > listStations->getCountOfStations() - 1) currentStation = 0;
       audio.connecttohost(listStations->getUrlOfStation(listStations->getNameOfStations(currentStation)).c_str());
-      //audio.connecttohost(stationsInfo[currentStation].url.c_str()); 
       write_stationName(listStations->getNameOfStations(currentStation).c_str());
     }
 }
@@ -233,13 +254,12 @@ static void eventMenuBtn(lv_event_t * e)
       if (!listDisplay) {
         if (volDisplay) HideVolume();
         CreateMenuOfStations();
-        lv_timer_reset(volTimer);
-        lv_timer_resume(volTimer);        
+        tickStationList = 0;
       }
       else 
       {
         HideMenuOfStations();
-        lv_timer_pause(volTimer);
+        tickStationList = 0;
       }
     }
 }
@@ -251,44 +271,13 @@ static void eventVolBtn(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     if(code == LV_EVENT_CLICKED) {
         if (volDisplay) {
-          vTaskSuspend(volumeDispTask);
-          lv_obj_del(slider);
-          lv_obj_del(label);
-          lv_obj_del(pageVolume);
-          slider = NULL;
-          label = NULL;
-          pageVolume = NULL;
-          volDisplay = false;
-          timeOutVolume = 0;
-          lv_timer_pause(volTimer);
+          HideVolume();
+          tickVolume = 0;
         } else
         {
           if (listDisplay) HideMenuOfStations();
-          /* Create page of volume */
-          pageVolume = lv_obj_create(lv_scr_act()); /*Create a parent object on the current screen*/
-          lv_obj_set_size(pageVolume, 300, 90);
-          lv_obj_align(pageVolume, LV_ALIGN_CENTER, 0, 0);
-
-          slider = lv_slider_create(pageVolume);
-          lv_obj_set_width(slider, 210);                                              // Set the width
-          lv_obj_center(slider);                                                      // Align to the center of the parent (screen)
-          lv_slider_set_range(slider, 0, 21);
-          lv_slider_set_value(slider, volumeOut, LV_ANIM_ON);
-          lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL); // Assign an event function
-
-          // Create a label above the slider
-          static lv_style_t stVolPageLabelStyle;
-          lv_style_init(&stVolPageLabelStyle);
-          lv_style_set_text_font(&stVolPageLabelStyle, &lv_font_montserrat_18);
-
-          label = lv_label_create(pageVolume);
-          lv_obj_add_style(label, &stVolPageLabelStyle, LV_PART_MAIN);
-          lv_label_set_text_fmt(label, "Volume %" LV_PRId32, lv_slider_get_value(slider));
-          lv_obj_align_to(label, slider, LV_ALIGN_OUT_TOP_MID, 0, -15); // Align top of the slider
-          volDisplay = true;
-          timeOutVolume = 0;
-          lv_timer_reset(volTimer);
-          lv_timer_resume(volTimer);         
+          CreateVolumePage();
+          tickVolume = 0;
         }
     }
 }
@@ -305,8 +294,8 @@ static void eventVolOffBtn(lv_event_t * e)
       if (volumeOut == 0)
       {
         volumeOut = oldVolume;
-        if (slider) lv_slider_set_value(slider, volumeOut, LV_ANIM_ON);
-        if (label) lv_label_set_text_fmt(label, "Volume %" LV_PRId32, lv_slider_get_value(slider));
+        if (sliderVolume) lv_slider_set_value(sliderVolume, volumeOut, LV_ANIM_ON);
+        if (labelVolumeTitle) lv_label_set_text_fmt(labelVolumeTitle, "Volume %" LV_PRId32, lv_slider_get_value(sliderVolume));
         lv_label_set_text_fmt(labelMainVolume, "Vol  %d", volumeOut);
         colour.ch.red   = 0x00;
         colour.ch.green = 0x00;
@@ -316,8 +305,8 @@ static void eventVolOffBtn(lv_event_t * e)
       {
         oldVolume = volumeOut;
         volumeOut = 0;
-        if (slider) lv_slider_set_value(slider, volumeOut, LV_ANIM_ON);
-        if (label) lv_label_set_text_fmt(label, "Volume %" LV_PRId32, lv_slider_get_value(slider));
+        if (sliderVolume) lv_slider_set_value(sliderVolume, volumeOut, LV_ANIM_ON);
+        if (labelVolumeTitle) lv_label_set_text_fmt(labelVolumeTitle, "Volume %" LV_PRId32, lv_slider_get_value(sliderVolume));
         lv_label_set_text_fmt(labelMainVolume, "Vol  %d", volumeOut);
         lv_imgbtn_set_src(btn, LV_IMGBTN_STATE_RELEASED, NULL, &vol_offed, NULL);
         colour.ch.red   = 0xFF;
@@ -352,10 +341,7 @@ void CreateControls(void)
   LV_IMG_DECLARE(playBtn);
   LV_IMG_DECLARE(pauseBtn);
   LV_IMG_DECLARE(nextStationBtn);
- 
 
-  volTimer = lv_timer_create(tickTimer, 1000,  NULL);
-  lv_timer_pause(volTimer);
 
   /*Create a transition animation on width transformation and recolor.*/
   static lv_style_prop_t tr_prop[] = {LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_IMG_RECOLOR_OPA};
@@ -479,7 +465,7 @@ void CreateControls(void)
   lv_obj_set_pos(prevBtn, 40, 213);
 
   /*Create an play and pause button*/
-  lv_obj_t * playPauseBtn = lv_imgbtn_create(lv_scr_act());
+  playPauseBtn = lv_imgbtn_create(lv_scr_act());
   if (audio.isRunning())
     lv_imgbtn_set_src(playPauseBtn, LV_IMGBTN_STATE_RELEASED, NULL, &pauseBtn, NULL);
   else
@@ -579,6 +565,7 @@ bool wifiSetup()
 
 
 void setup() {
+  audioPlaying = false;
   readConfig = new sdConfig();
   listStations = new listOfStations();
  
@@ -603,15 +590,17 @@ void setup() {
     {
       currentStation = 0;
       audio.connecttohost(listStations->getUrlOfStation(listStations->getNameOfStations(currentStation)).c_str());
-      //audio.connecttohost(stationsInfo[currentStation].url.c_str());
     }  else
     {
       audio_showstation("Radio Stations not found!");
     }
   }
 
+  dispTimer = lv_timer_create(tickTimer, 1000,  NULL);
+
   delay(500); 
 
+  playPauseBtnChangeState(audio.isRunning());
 }
 
 

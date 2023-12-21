@@ -8,6 +8,7 @@ int currentStation = 0;
 // struct _stationInfo stationsInfo[MAX_STATIONS];
 
 // Create Audio objects
+bool audioPlaying;
 Audio audio;
 
 // WiFi settings

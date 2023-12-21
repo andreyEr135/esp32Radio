@@ -45,6 +45,7 @@ extern listOfStations *listStations;
 extern int currentStation;
 
 // Create Audio objects
+extern bool audioPlaying;
 extern Audio audio;
 
 // WiFi settings
