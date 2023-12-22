@@ -1,6 +1,12 @@
 #include "uiModules.h"
 
+// WiFi info
+lv_obj_t *iconWifi;
 
+// Volume label
+lv_obj_t *iconVolume;
+lv_style_t stVolLabelStyle;
+lv_obj_t *labelMainVolume;
 
 
 // Volume page and elements
@@ -17,9 +23,7 @@ lv_obj_t *pageStationsList;
 lv_obj_t *labelListTitle;
 lv_obj_t *menuOfStations;
 
-// Volume label
-lv_style_t stVolLabelStyle;
-lv_obj_t *labelMainVolume;
+
 
 // Station name and track title labels
 lv_obj_t *labelStationName;

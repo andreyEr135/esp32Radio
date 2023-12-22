@@ -11,6 +11,14 @@
 // Create an instance of the prepared class
 #include <lvgl.h>
 
+// WiFi info
+extern lv_obj_t *iconWifi;
+
+// Volume info
+extern lv_obj_t *iconVolume;
+extern lv_style_t stVolLabelStyle;
+extern lv_obj_t *labelMainVolume;
+
 // Volume page and elements
 extern bool volDisplay;
 extern int tickVolume;
@@ -25,9 +33,7 @@ extern lv_obj_t *pageStationsList;
 extern lv_obj_t *labelListTitle;
 extern lv_obj_t *menuOfStations;
 
-// Volume label
-extern lv_style_t stVolLabelStyle;
-extern lv_obj_t *labelMainVolume;
+
 
 // Station name and track title labels
 extern lv_obj_t *labelStationName;

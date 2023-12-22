@@ -12,6 +12,7 @@ bool audioPlaying;
 Audio audio;
 
 // WiFi settings
+bool wifiConnect;
 String ssid;
 String password;
 

@@ -49,6 +49,7 @@ extern bool audioPlaying;
 extern Audio audio;
 
 // WiFi settings
+extern bool wifiConnect;
 extern String ssid;
 extern String password;
 

@@ -22,6 +22,111 @@ static lv_color_t buf[screenWidth * 10];
 sdConfig *readConfig;
 
 
+void wifiInfoReDraw()
+{
+  LV_IMG_DECLARE(wifiIcon);
+  LV_IMG_DECLARE(wifiNoIcon);
+
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    if (!wifiConnect) lv_img_set_src(iconWifi, &wifiIcon);    
+  } else
+  {
+    if (wifiConnect) lv_img_set_src(iconWifi, &wifiNoIcon);
+  }
+  wifiConnect = (WiFi.status() == WL_CONNECTED);
+}
+
+void wifiInfoDraw()
+{
+  LV_IMG_DECLARE(wifiIcon);
+  LV_IMG_DECLARE(wifiNoIcon);
+  
+  wifiConnect = (WiFi.status() == WL_CONNECTED);
+  iconWifi = lv_img_create(lv_scr_act());
+  if (wifiConnect)
+  {
+    lv_img_set_src(iconWifi, &wifiIcon);    
+  } else
+  {
+    lv_img_set_src(iconWifi, &wifiNoIcon);
+  }
+  lv_obj_set_pos(iconWifi, 320, 5);  
+}
+
+
+void volumeInfoReDraw()
+{
+  LV_IMG_DECLARE(volumeIcon);
+  LV_IMG_DECLARE(volumeOffIcon);
+
+  lv_color_t colour;
+
+  if (volumeOut == 0) 
+  {
+    lv_img_set_src(iconVolume, &volumeOffIcon);
+    colour.ch.red   = 0xFF;
+    colour.ch.green = 0x00;
+    colour.ch.blue  = 0x00;
+    lv_style_set_text_color(&stVolLabelStyle, colour);
+    lv_obj_add_style(labelMainVolume, &stVolLabelStyle, LV_PART_MAIN);
+  }
+  else 
+  {
+    if (prevVol == 0) 
+    {
+      lv_img_set_src(iconVolume, &volumeIcon);
+      colour.ch.red   = 0x00;
+      colour.ch.green = 0xFF;
+      colour.ch.blue  = 0x05;
+      lv_style_set_text_color(&stVolLabelStyle, colour);
+      lv_obj_add_style(labelMainVolume, &stVolLabelStyle, LV_PART_MAIN);
+    }  
+  }
+  lv_label_set_text_fmt(labelMainVolume, "%d", volumeOut);
+}
+
+void volumeInfoDraw()
+{
+  LV_IMG_DECLARE(volumeIcon);
+  LV_IMG_DECLARE(volumeOffIcon);
+  
+  iconVolume = lv_img_create(lv_scr_act());
+  if (volumeOut == 0) 
+  {
+    lv_img_set_src(iconVolume, &volumeOffIcon);
+  }
+  else
+  {
+    lv_img_set_src(iconVolume, &volumeIcon);
+  } 
+  lv_obj_set_pos(iconVolume, 352, 5);
+
+  lv_style_init(&stVolLabelStyle);
+  lv_style_set_text_font(&stVolLabelStyle, &ubuntu_24);
+  lv_color_t colour;
+  if (volumeOut == 0) 
+  {
+    colour.ch.red   = 0xFF;
+    colour.ch.green = 0x00;
+    colour.ch.blue  = 0x00;
+  } else
+  {
+    colour.ch.red   = 0x00;
+    colour.ch.green = 0xFF;
+    colour.ch.blue  = 0x05;
+  }
+  lv_style_set_text_color(&stVolLabelStyle, colour);
+
+  labelMainVolume = lv_label_create(lv_scr_act());
+  lv_label_set_text_fmt(labelMainVolume, "%d", volumeOut);
+  
+  lv_obj_set_pos(labelMainVolume, 377, 2);
+  lv_obj_add_style(labelMainVolume, &stVolLabelStyle, LV_PART_MAIN);
+  
+}
+
+
 void HideMenuOfStations()
 {
   lv_obj_del(labelListTitle);
@@ -88,6 +193,7 @@ void tickTimer(lv_timer_t * timer)
   if (listDisplay) tickStationList++;
 
   playPauseBtnChangeState(audio.isRunning());
+  wifiInfoReDraw();
 }
 
 
@@ -114,10 +220,10 @@ void CreateMenuOfStations()
 
   static lv_style_t stLabelStyle;
   lv_style_init(&stLabelStyle);
-  lv_style_set_text_font(&stLabelStyle, &lv_font_montserrat_18);
+  lv_style_set_text_font(&stLabelStyle, &ubuntu_18);
   labelListTitle = lv_label_create(pageStationsList);
-  lv_label_set_text_fmt(labelListTitle, "Stations list");
-  lv_obj_set_pos(labelListTitle, 120, 0);
+  lv_label_set_text_fmt(labelListTitle, "Список станций");
+  lv_obj_set_pos(labelListTitle, 90, 0);
   lv_obj_add_style(labelListTitle, &stLabelStyle, LV_PART_MAIN);
 
   menuOfStations = lv_list_create(pageStationsList);
@@ -127,8 +233,9 @@ void CreateMenuOfStations()
   lv_obj_t *list_btn;
 
   for (int i = 0; i < listStations->getCountOfStations(); i++)
-  {
+  {    
     list_btn = lv_list_add_btn(menuOfStations, NULL, listStations->getNameOfStations(i).c_str());
+    //lv_style_set_text_font(&menuOfStations, &ubuntu_18);
     lv_obj_add_event_cb(list_btn, eventListClickedHandler, LV_EVENT_CLICKED, NULL);
   }
   listDisplay = true;
@@ -150,12 +257,12 @@ void CreateVolumePage()
   // Create a label above the slider
   static lv_style_t stVolPageLabelStyle;
   lv_style_init(&stVolPageLabelStyle);
-  lv_style_set_text_font(&stVolPageLabelStyle, &lv_font_montserrat_18);
+  lv_style_set_text_font(&stVolPageLabelStyle, &ubuntu_18);
 
   labelVolumeTitle = lv_label_create(pageVolume);
   lv_obj_add_style(labelVolumeTitle, &stVolPageLabelStyle, LV_PART_MAIN);
-  lv_label_set_text_fmt(labelVolumeTitle, "Volume %" LV_PRId32, lv_slider_get_value(sliderVolume));
-  lv_obj_align_to(labelVolumeTitle, sliderVolume, LV_ALIGN_OUT_TOP_MID, 0, -15); // Align top of the slider
+  lv_label_set_text_fmt(labelVolumeTitle, "Громкость %" LV_PRId32, lv_slider_get_value(sliderVolume));
+  lv_obj_align_to(labelVolumeTitle, sliderVolume, LV_ALIGN_OUT_TOP_MID, 0, -7); // Align top of the slider
   volDisplay = true;
 }
 
@@ -166,31 +273,19 @@ static void slider_event_cb(lv_event_t *e)
   LV_IMG_DECLARE(vol_offed);
   tickVolume = 0;
   // Refresh the text
-  lv_label_set_text_fmt(labelVolumeTitle, "Volume %" LV_PRId32, lv_slider_get_value(sliderVolume));
+  lv_label_set_text_fmt(labelVolumeTitle, "Громкость %" LV_PRId32, lv_slider_get_value(sliderVolume));
   volumeOut = lv_slider_get_value(sliderVolume);
-  lv_label_set_text_fmt(labelMainVolume, "Vol  %d", volumeOut);
+  // lv_label_set_text_fmt(labelMainVolume, "Vol  %d", volumeOut);
   audio.setVolume(volumeOut);
+  volumeInfoReDraw();
 
   if (volumeOut == 0)
   {
-    lv_color_t colour;
-    colour.ch.red   = 0xFF;
-    colour.ch.green = 0x00;
-    colour.ch.blue  = 0x00;
-    lv_style_set_text_color(&stVolLabelStyle, colour);
-    lv_obj_add_style(labelMainVolume, &stVolLabelStyle, LV_PART_MAIN);
-    lv_imgbtn_set_src(volOffBtn, LV_IMGBTN_STATE_RELEASED, NULL, &vol_offed, NULL);
-    
+    lv_imgbtn_set_src(volOffBtn, LV_IMGBTN_STATE_RELEASED, NULL, &vol_offed, NULL); 
   } else
   {
     if (prevVol == 0) 
     {
-      lv_color_t colour;
-      colour.ch.red   = 0x00;
-      colour.ch.green = 0x00;
-      colour.ch.blue  = 0x00;
-      lv_style_set_text_color(&stVolLabelStyle, colour);
-      lv_obj_add_style(labelMainVolume, &stVolLabelStyle, LV_PART_MAIN);
       lv_imgbtn_set_src(volOffBtn, LV_IMGBTN_STATE_RELEASED, NULL, &vol_off, NULL);
     }
   }
@@ -205,7 +300,6 @@ static void eventPrevStationBtn(lv_event_t * e)
       if (currentStation < 0) currentStation = listStations->getCountOfStations() - 1;
       write_stationName(listStations->getNameOfStations(currentStation).c_str());
       audio.connecttohost(listStations->getUrlOfStation(listStations->getNameOfStations(currentStation)).c_str());
-      //audio.connecttohost(stationsInfo[currentStation].url.c_str()); 
     }
 }
 
@@ -290,32 +384,22 @@ static void eventVolOffBtn(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * btn = lv_event_get_target(e);
     if(code == LV_EVENT_CLICKED) {
-      lv_color_t colour;
       if (volumeOut == 0)
       {
         volumeOut = oldVolume;
         if (sliderVolume) lv_slider_set_value(sliderVolume, volumeOut, LV_ANIM_ON);
-        if (labelVolumeTitle) lv_label_set_text_fmt(labelVolumeTitle, "Volume %" LV_PRId32, lv_slider_get_value(sliderVolume));
-        lv_label_set_text_fmt(labelMainVolume, "Vol  %d", volumeOut);
-        colour.ch.red   = 0x00;
-        colour.ch.green = 0x00;
-        colour.ch.blue  = 0x00;
+        if (labelVolumeTitle) lv_label_set_text_fmt(labelVolumeTitle, "Громкость %" LV_PRId32, lv_slider_get_value(sliderVolume));
         lv_imgbtn_set_src(btn, LV_IMGBTN_STATE_RELEASED, NULL, &vol_off, NULL);
       } else
       {
         oldVolume = volumeOut;
         volumeOut = 0;
         if (sliderVolume) lv_slider_set_value(sliderVolume, volumeOut, LV_ANIM_ON);
-        if (labelVolumeTitle) lv_label_set_text_fmt(labelVolumeTitle, "Volume %" LV_PRId32, lv_slider_get_value(sliderVolume));
-        lv_label_set_text_fmt(labelMainVolume, "Vol  %d", volumeOut);
+        if (labelVolumeTitle) lv_label_set_text_fmt(labelVolumeTitle, "Громкость %" LV_PRId32, lv_slider_get_value(sliderVolume));
         lv_imgbtn_set_src(btn, LV_IMGBTN_STATE_RELEASED, NULL, &vol_offed, NULL);
-        colour.ch.red   = 0xFF;
-        colour.ch.green = 0x00;
-        colour.ch.blue  = 0x00;
       }
-      lv_style_set_text_color(&stVolLabelStyle, colour);
-      lv_obj_add_style(labelMainVolume, &stVolLabelStyle, LV_PART_MAIN);
       audio.setVolume(volumeOut);
+      volumeInfoReDraw();
       prevVol = volumeOut;
     }
 }
@@ -342,7 +426,6 @@ void CreateControls(void)
   LV_IMG_DECLARE(pauseBtn);
   LV_IMG_DECLARE(nextStationBtn);
 
-
   /*Create a transition animation on width transformation and recolor.*/
   static lv_style_prop_t tr_prop[] = {LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_IMG_RECOLOR_OPA};
   static lv_style_transition_dsc_t tr;
@@ -360,6 +443,7 @@ void CreateControls(void)
   lv_style_set_img_recolor(&style_pr, lv_color_black());
   //lv_style_set_transform_width(&style_pr, 20);
 
+  wifiInfoDraw();
 
   /*  Create menus buttons  */
   /*Create an menu button*/
@@ -392,32 +476,10 @@ void CreateControls(void)
 
   /*  Create main widget buttons and infos  */
   static lv_obj_t *labelVersion = lv_label_create(lv_scr_act());
-  lv_label_set_text_fmt(labelVersion, "Network Radio v1.0");
+  lv_label_set_text_fmt(labelVersion, "Интернет радио v1.1");
   lv_obj_set_pos(labelVersion, 5, 5);
 
-
-  
-  lv_style_init(&stVolLabelStyle);
-  lv_style_set_text_font(&stVolLabelStyle, &lv_font_montserrat_16);
-  lv_color_t colour;
-  if (volumeOut == 0) 
-  {
-    colour.ch.red   = 0xFF;
-    colour.ch.green = 0x00;
-    colour.ch.blue  = 0x00;
-  } else
-  {
-    colour.ch.red   = 0x00;
-    colour.ch.green = 0x00;
-    colour.ch.blue  = 0x00;
-  }
-  lv_style_set_text_color(&stVolLabelStyle, colour);
-
-  labelMainVolume = lv_label_create(lv_scr_act());
-  lv_label_set_text_fmt(labelMainVolume, "Vol  %d", volumeOut);
-  
-  lv_obj_set_pos(labelMainVolume, 335, 10);
-  lv_obj_add_style(labelMainVolume, &stVolLabelStyle, LV_PART_MAIN);
+  volumeInfoDraw();
 
 
   /* Create an play or pause icon */
@@ -435,7 +497,7 @@ void CreateControls(void)
   
   static lv_style_t stNameLabelStyle;
   lv_style_init(&stNameLabelStyle);
-  lv_style_set_text_font(&stNameLabelStyle, &lv_font_montserrat_24);
+  lv_style_set_text_font(&stNameLabelStyle, &ubuntu_24);
   labelStationName = lv_label_create(lv_scr_act());
   lv_label_set_text_fmt(labelStationName, "Loading...");
   lv_obj_set_pos(labelStationName, 5, 65);
@@ -445,7 +507,7 @@ void CreateControls(void)
 
   static lv_style_t stTitleLabelStyle;
   lv_style_init(&stTitleLabelStyle);
-  lv_style_set_text_font(&stTitleLabelStyle, &lv_font_montserrat_18);
+  lv_style_set_text_font(&stTitleLabelStyle, &ubuntu_18);
   labelTitle = lv_label_create(lv_scr_act());
   lv_label_set_text_fmt(labelTitle, "no data.. wait");
   lv_label_set_long_mode(labelTitle, LV_LABEL_LONG_SCROLL_CIRCULAR);
@@ -541,6 +603,9 @@ void audioSetup()
 
 bool wifiSetup()
 {
+  wifiConnect = false;
+  audio_showstation("Waiting connection to WiFi");
+  audio_showstreamtitle(ssid.c_str());
   WiFi.disconnect();
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid.c_str(), password.c_str());
@@ -562,7 +627,6 @@ bool wifiSetup()
   audio_showstation("Connected to WiFi");
   return true;
 }
-
 
 void setup() {
   audioPlaying = false;
