@@ -19,7 +19,6 @@ class sysTime
     String ntpServer;
     long  gmtOffset_sec;
     int   daylightOffset_sec;
-    int   offset;
 
   
 };

@@ -11,6 +11,10 @@
 // Create an instance of the prepared class
 #include <lvgl.h>
 
+// styles
+extern lv_style_t style_def;
+extern lv_style_t style_pr;
+
 // Time info
 extern lv_obj_t *labelTime;
 

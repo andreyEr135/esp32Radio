@@ -36,6 +36,7 @@ bool sdConfig::readConfig()
   /* READ PASSWORD */
   const char* _password = config["password"];
   password = String(_password);
+  
 
   /* READ STATIONS-LIST */
   int cnt = atoi(config["stations"]["count"]);

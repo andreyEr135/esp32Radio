@@ -1,5 +1,10 @@
 #include "uiModules.h"
 
+// styles
+lv_style_t style_def;
+lv_style_t style_pr;
+
+
 // Time info
 lv_obj_t *labelTime;
 

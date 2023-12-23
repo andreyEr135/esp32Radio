@@ -448,50 +448,18 @@ void showVersionStr()
   lv_obj_add_style(labelVersion, &stVersionLabelStyle, LV_PART_MAIN);
 }
 
-
-
-// Create a slider and write its value on a label.
-void CreateControls(void)
+void showBackground()
 {
   LV_IMG_DECLARE(background);
-  LV_IMG_DECLARE(menu);
-  LV_IMG_DECLARE(volume);
-  LV_IMG_DECLARE(vol_off);
-  LV_IMG_DECLARE(vol_offed);
-
-  LV_IMG_DECLARE(playIcon);
-  LV_IMG_DECLARE(pauseIcon);
-
-  LV_IMG_DECLARE(prevStationBtn);
-  LV_IMG_DECLARE(playBtn);
-  LV_IMG_DECLARE(pauseBtn);
-  LV_IMG_DECLARE(nextStationBtn);
-
-  /*Create a transition animation on width transformation and recolor.*/
-  static lv_style_prop_t tr_prop[] = {LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_IMG_RECOLOR_OPA};
-  static lv_style_transition_dsc_t tr;
-  lv_style_transition_dsc_init(&tr, tr_prop, lv_anim_path_linear, 0, 0, NULL);
-
-  static lv_style_t style_def;
-  lv_style_init(&style_def);
-  lv_style_set_text_color(&style_def, lv_color_white());
-  lv_style_set_transition(&style_def, &tr);
-
-  /*Darken the button when pressed and make it wider*/
-  static lv_style_t style_pr;
-  lv_style_init(&style_pr);
-  lv_style_set_img_recolor_opa(&style_pr, LV_OPA_30);
-  lv_style_set_img_recolor(&style_pr, lv_color_black());
-  //lv_style_set_transform_width(&style_pr, 20);
-
   lv_obj_t *backgroundImg = lv_img_create(lv_scr_act());
   lv_img_set_src(backgroundImg, &background);
-  lv_obj_set_pos(backgroundImg, 0, 0);
+  lv_obj_set_pos(backgroundImg, 0, 0);  
+}
 
-  wifiInfoDraw();
 
-  /*  Create menus buttons  */
-  /*Create an menu button*/
+void showMenuBtn()
+{
+  LV_IMG_DECLARE(menu);
   lv_obj_t * menuBtn = lv_imgbtn_create(lv_scr_act());
   lv_imgbtn_set_src(menuBtn, LV_IMGBTN_STATE_RELEASED, NULL, &menu, NULL);
   lv_obj_add_style(menuBtn, &style_def, 0);
@@ -499,17 +467,24 @@ void CreateControls(void)
   lv_obj_set_size(menuBtn, 50, 50);
   lv_obj_add_event_cb(menuBtn, eventMenuBtn, LV_EVENT_ALL, NULL);
   lv_obj_set_pos(menuBtn, screenWidth - 60, 16);
+}
 
-  /*Create an volume button*/
+void showVolumeBtn()
+{
+  LV_IMG_DECLARE(volume);
   lv_obj_t * volBtn = lv_imgbtn_create(lv_scr_act());
   lv_imgbtn_set_src(volBtn, LV_IMGBTN_STATE_RELEASED, NULL, &volume, NULL);
   lv_obj_add_style(volBtn, &style_def, 0);
   lv_obj_add_style(volBtn, &style_pr, LV_STATE_PRESSED);
   lv_obj_set_size(volBtn, 50, 50);
   lv_obj_add_event_cb(volBtn, eventVolBtn, LV_EVENT_ALL, NULL);
-  lv_obj_set_pos(volBtn, screenWidth - 60, 16 + 50 + 63);
+  lv_obj_set_pos(volBtn, 404, 133); //screenWidth - 60, 16 + 50 + 63);
+}
 
-  /*Create an volume_off button*/
+void showVolumeOffBtn()
+{
+  LV_IMG_DECLARE(vol_off);
+  LV_IMG_DECLARE(vol_offed);
   volOffBtn = lv_imgbtn_create(lv_scr_act());
   if (volumeOut == 0) lv_imgbtn_set_src(volOffBtn, LV_IMGBTN_STATE_RELEASED, NULL, &vol_offed, NULL);
   else lv_imgbtn_set_src(volOffBtn, LV_IMGBTN_STATE_RELEASED, NULL, &vol_off, NULL);
@@ -518,29 +493,17 @@ void CreateControls(void)
   lv_obj_set_size(volOffBtn, 50, 50);
   lv_obj_add_event_cb(volOffBtn, eventVolOffBtn, LV_EVENT_ALL, NULL);
   lv_obj_set_pos(volOffBtn, screenWidth - 60, 16 + 2*50 + 2*63);
+}
 
-  /*  Create main widget buttons and infos  */
+void createMenu()
+{
+  showMenuBtn();
+  showVolumeBtn();
+  showVolumeOffBtn();
+}
 
-  showTimeStr();
-
-  showVersionStr();  
-
-  volumeInfoDraw();
-
-
-  /* Create an play or pause icon */
-  iconPlayPause = lv_img_create(lv_scr_act());
-  if (audio.isRunning() == true) 
-  {
-    lv_img_set_src(iconPlayPause, &playIcon);
-    lv_obj_set_pos(iconPlayPause, 14, 120);
-  }
-  else
-  {
-    lv_img_set_src(iconPlayPause, &pauseIcon);
-    lv_obj_set_pos(iconPlayPause, 26, 115);
-  }
-  
+void showNameStationLabel()
+{
   static lv_style_t stNameLabelStyle;
   lv_style_init(&stNameLabelStyle);
   lv_style_set_text_font(&stNameLabelStyle, &ubuntu_24);
@@ -555,21 +518,47 @@ void CreateControls(void)
   lv_style_set_text_color(&stNameLabelStyle, colour);
   lv_obj_add_style(labelStationName, &stNameLabelStyle, LV_PART_MAIN);
   lv_label_set_long_mode(labelStationName, LV_LABEL_LONG_SCROLL_CIRCULAR);
+}
 
+void showTitleInfoLabel()
+{
   static lv_style_t stTitleLabelStyle;
   lv_style_init(&stTitleLabelStyle);
+  lv_color_t colour;
+  colour.ch.red   = 0x04;
+  colour.ch.green = 0xFB;
+  colour.ch.blue  = 0x00;
   lv_style_set_text_font(&stTitleLabelStyle, &ubuntu_18);
   labelTitle = lv_label_create(lv_scr_act());
   lv_label_set_text_fmt(labelTitle, "no data.. wait");
   lv_label_set_long_mode(labelTitle, LV_LABEL_LONG_SCROLL_CIRCULAR);
   lv_style_set_text_color(&stTitleLabelStyle, colour);
   lv_obj_add_style(labelTitle, &stTitleLabelStyle, LV_PART_MAIN);
-  //lv_label_set_align(labelTitle, LV_LABEL_ALIGN_CENTER);
   lv_obj_set_pos(labelTitle, 90, 131);
-  lv_obj_set_size(labelTitle, 323, 69); 
+  lv_obj_set_size(labelTitle, 313, 69); 
+}
 
+void showPlayPauseIcon()
+{
+  LV_IMG_DECLARE(playIcon);
+  LV_IMG_DECLARE(pauseIcon);
 
-  /*Create an prev station button*/
+  iconPlayPause = lv_img_create(lv_scr_act());
+  if (audio.isRunning() == true) 
+  {
+    lv_img_set_src(iconPlayPause, &playIcon);
+    lv_obj_set_pos(iconPlayPause, 14, 120);
+  }
+  else
+  {
+    lv_img_set_src(iconPlayPause, &pauseIcon);
+    lv_obj_set_pos(iconPlayPause, 26, 115);
+  }
+}
+
+void showPrevBtn()
+{
+  LV_IMG_DECLARE(prevStationBtn);
   lv_obj_t * prevBtn = lv_imgbtn_create(lv_scr_act());
   lv_imgbtn_set_src(prevBtn, LV_IMGBTN_STATE_RELEASED, NULL, &prevStationBtn, NULL);
   lv_obj_add_style(prevBtn, &style_def, 0);
@@ -577,8 +566,12 @@ void CreateControls(void)
   lv_obj_set_size(prevBtn, 85, 85);
   lv_obj_add_event_cb(prevBtn, eventPrevStationBtn, LV_EVENT_ALL, NULL);
   lv_obj_set_pos(prevBtn, 40, 213);
+}
 
-  /*Create an play and pause button*/
+void showPlayPauseBtn()
+{
+  LV_IMG_DECLARE(playBtn);
+  LV_IMG_DECLARE(pauseBtn);
   playPauseBtn = lv_imgbtn_create(lv_scr_act());
   if (audio.isRunning())
     lv_imgbtn_set_src(playPauseBtn, LV_IMGBTN_STATE_RELEASED, NULL, &pauseBtn, NULL);
@@ -589,8 +582,11 @@ void CreateControls(void)
   lv_obj_set_size(playPauseBtn, 100, 100);
   lv_obj_add_event_cb(playPauseBtn, eventPlayPauseBtn, LV_EVENT_ALL, NULL);
   lv_obj_set_pos(playPauseBtn, 159, 205);
+}
 
-  /*Create an next station button*/
+void showNextBtn()
+{
+  LV_IMG_DECLARE(nextStationBtn);
   lv_obj_t * nextBtn = lv_imgbtn_create(lv_scr_act());
   lv_imgbtn_set_src(nextBtn, LV_IMGBTN_STATE_RELEASED, NULL, &nextStationBtn, NULL);
   lv_obj_add_style(nextBtn, &style_def, 0);
@@ -598,18 +594,56 @@ void CreateControls(void)
   lv_obj_set_size(nextBtn, 85, 85);
   lv_obj_add_event_cb(nextBtn, eventNextStationBtn, LV_EVENT_ALL, NULL);
   lv_obj_set_pos(nextBtn, 293, 213);
+  
+}
+
+
+
+// Create a slider and write its value on a label.
+void CreateControls(void)
+{
+  /*Create a transition animation on width transformation and recolor.*/
+  static lv_style_prop_t tr_prop[] = {LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_IMG_RECOLOR_OPA};
+  static lv_style_transition_dsc_t tr;
+  lv_style_transition_dsc_init(&tr, tr_prop, lv_anim_path_linear, 0, 0, NULL);
+
+  lv_style_init(&style_def);
+  lv_style_set_text_color(&style_def, lv_color_white());
+  lv_style_set_transition(&style_def, &tr);
+
+  /*Darken the button when pressed and make it wider*/
+  lv_style_init(&style_pr);
+  lv_style_set_img_recolor_opa(&style_pr, LV_OPA_30);
+  lv_style_set_img_recolor(&style_pr, lv_color_black());
+  //lv_style_set_transform_width(&style_pr, 20);
+
+  showBackground();
+
+  showTimeStr();
+
+  showVersionStr();  
+
+  wifiInfoDraw();
+
+  volumeInfoDraw();
+
+  createMenu();
+
+  showNameStationLabel();
+
+  showPlayPauseIcon();
+
+  showTitleInfoLabel();
+
+  showPrevBtn();
+
+  showPlayPauseBtn();
+
+  showNextBtn();
+
 
   volDisplay = false;
   listDisplay = false;
-
-
-  
-
-
-  
-
-
-
 
 }
 
