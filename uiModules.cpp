@@ -1,5 +1,8 @@
 #include "uiModules.h"
 
+// Time info
+lv_obj_t *labelTime;
+
 // WiFi info
 lv_obj_t *iconWifi;
 

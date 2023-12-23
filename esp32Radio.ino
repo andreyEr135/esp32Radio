@@ -126,6 +126,11 @@ void volumeInfoDraw()
   
 }
 
+void reshowTimeStr()
+{
+  lv_label_set_text_fmt(labelTime, sTime->getTime().c_str());
+}
+
 
 void HideMenuOfStations()
 {
@@ -194,6 +199,7 @@ void tickTimer(lv_timer_t * timer)
 
   playPauseBtnChangeState(audio.isRunning());
   wifiInfoReDraw();
+  reshowTimeStr();
 }
 
 
@@ -405,14 +411,49 @@ static void eventVolOffBtn(lv_event_t * e)
 }
 
 
+void showTimeStr()
+{
+  static lv_style_t stTimeLabelStyle;
+  lv_style_init(&stTimeLabelStyle);
+  lv_style_set_text_font(&stTimeLabelStyle, &ubuntu_18);
+  lv_color_t colour;
+  colour.ch.red   = 0x00;
+  colour.ch.green = 0xFF;
+  colour.ch.blue  = 0x00;
+  lv_style_set_text_color(&stTimeLabelStyle, colour);
+
+  labelTime = lv_label_create(lv_scr_act());
+  lv_label_set_text_fmt(labelTime, sTime->getTime().c_str());
+  lv_obj_set_pos(labelTime, 5, 5);
+  
+  lv_obj_add_style(labelTime, &stTimeLabelStyle, LV_PART_MAIN);
+}
 
 
+void showVersionStr()
+{
+  static lv_style_t stVersionLabelStyle;
+  lv_style_init(&stVersionLabelStyle);
+  lv_style_set_text_font(&stVersionLabelStyle, &ubuntu_16);
+  lv_color_t colour;
+  colour.ch.red   = 0x04;
+  colour.ch.green = 0xFB;
+  colour.ch.blue  = 0x00;
+  lv_style_set_text_color(&stVersionLabelStyle, colour);
+
+  static lv_obj_t *labelVersion = lv_label_create(lv_scr_act());
+  lv_label_set_text_fmt(labelVersion, "v1.1");
+  lv_obj_set_pos(labelVersion, 215, 5);
+  
+  lv_obj_add_style(labelVersion, &stVersionLabelStyle, LV_PART_MAIN);
+}
 
 
 
 // Create a slider and write its value on a label.
 void CreateControls(void)
 {
+  LV_IMG_DECLARE(background);
   LV_IMG_DECLARE(menu);
   LV_IMG_DECLARE(volume);
   LV_IMG_DECLARE(vol_off);
@@ -442,6 +483,10 @@ void CreateControls(void)
   lv_style_set_img_recolor_opa(&style_pr, LV_OPA_30);
   lv_style_set_img_recolor(&style_pr, lv_color_black());
   //lv_style_set_transform_width(&style_pr, 20);
+
+  lv_obj_t *backgroundImg = lv_img_create(lv_scr_act());
+  lv_img_set_src(backgroundImg, &background);
+  lv_obj_set_pos(backgroundImg, 0, 0);
 
   wifiInfoDraw();
 
@@ -475,9 +520,10 @@ void CreateControls(void)
   lv_obj_set_pos(volOffBtn, screenWidth - 60, 16 + 2*50 + 2*63);
 
   /*  Create main widget buttons and infos  */
-  static lv_obj_t *labelVersion = lv_label_create(lv_scr_act());
-  lv_label_set_text_fmt(labelVersion, "Интернет радио v1.1");
-  lv_obj_set_pos(labelVersion, 5, 5);
+
+  showTimeStr();
+
+  showVersionStr();  
 
   volumeInfoDraw();
 
@@ -502,6 +548,11 @@ void CreateControls(void)
   lv_label_set_text_fmt(labelStationName, "Loading...");
   lv_obj_set_pos(labelStationName, 5, 65);
   lv_obj_set_size(labelStationName, 390, 73);
+  lv_color_t colour;
+  colour.ch.red   = 0x04;
+  colour.ch.green = 0xFB;
+  colour.ch.blue  = 0x00;
+  lv_style_set_text_color(&stNameLabelStyle, colour);
   lv_obj_add_style(labelStationName, &stNameLabelStyle, LV_PART_MAIN);
   lv_label_set_long_mode(labelStationName, LV_LABEL_LONG_SCROLL_CIRCULAR);
 
@@ -511,6 +562,7 @@ void CreateControls(void)
   labelTitle = lv_label_create(lv_scr_act());
   lv_label_set_text_fmt(labelTitle, "no data.. wait");
   lv_label_set_long_mode(labelTitle, LV_LABEL_LONG_SCROLL_CIRCULAR);
+  lv_style_set_text_color(&stTitleLabelStyle, colour);
   lv_obj_add_style(labelTitle, &stTitleLabelStyle, LV_PART_MAIN);
   //lv_label_set_align(labelTitle, LV_LABEL_ALIGN_CENTER);
   lv_obj_set_pos(labelTitle, 90, 131);
@@ -632,6 +684,7 @@ void setup() {
   audioPlaying = false;
   readConfig = new sdConfig();
   listStations = new listOfStations();
+  sTime = new sysTime(TIME_OFFSET);
  
   displaySetup();
  
@@ -658,6 +711,7 @@ void setup() {
     {
       audio_showstation("Radio Stations not found!");
     }
+    sTime->syncTime();
   }
 
   dispTimer = lv_timer_create(tickTimer, 1000,  NULL);

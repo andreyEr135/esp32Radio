@@ -16,6 +16,9 @@ bool wifiConnect;
 String ssid;
 String password;
 
+// SysTime
+sysTime *sTime;
+
 // LGFX
 LGFX tft;
 

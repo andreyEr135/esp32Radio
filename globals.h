@@ -11,6 +11,7 @@
 #include <lvgl.h>
 
 #include "listOfStations.h"
+#include "sysTime.h"
 
 #define TIMEOUT_WIFI_CONNECT     10
 #define TIMEOUT_VOLUME_PAGE      10
@@ -52,6 +53,11 @@ extern Audio audio;
 extern bool wifiConnect;
 extern String ssid;
 extern String password;
+
+// SysTime
+#define TIME_OFFSET 3
+class sysTime;
+extern sysTime *sTime;
 
 // LGFX
 class LGFX : public lgfx::LGFX_Device

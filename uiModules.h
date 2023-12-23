@@ -11,6 +11,9 @@
 // Create an instance of the prepared class
 #include <lvgl.h>
 
+// Time info
+extern lv_obj_t *labelTime;
+
 // WiFi info
 extern lv_obj_t *iconWifi;
 
