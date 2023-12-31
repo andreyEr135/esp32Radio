@@ -19,6 +19,9 @@ String password;
 // SysTime
 sysTime *sTime;
 
+// Weather
+weather *weatherService;
+
 // LGFX
 LGFX tft;
 

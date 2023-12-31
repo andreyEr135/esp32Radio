@@ -14,17 +14,26 @@
 
 class sdConfig
 {
-  
+  public:
+    sdConfig();
+    bool readConfig();
+    String GetError();
+
+    String getWeatherToken();
+    float getWeatherLat();
+    float getWeatherLon();
+
   private:
     bool initSD();
     String configFile;
     bool sdInited;
     String errorStr;
     SPIClass hspi;
-  public:
-    sdConfig();
-    bool readConfig();
-    String GetError();
+
+    String weatherToken;
+    float weatherLat;
+    float weatherLon;
+  
 };
 
 

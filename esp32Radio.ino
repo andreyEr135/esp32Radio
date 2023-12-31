@@ -517,7 +517,7 @@ void showNameStationLabel()
   colour.ch.blue  = 0x00;
   lv_style_set_text_color(&stNameLabelStyle, colour);
   lv_obj_add_style(labelStationName, &stNameLabelStyle, LV_PART_MAIN);
-  lv_label_set_long_mode(labelStationName, LV_LABEL_LONG_SCROLL_CIRCULAR);
+  //lv_label_set_long_mode(labelStationName, LV_LABEL_LONG_SCROLL_CIRCULAR);
 }
 
 void showTitleInfoLabel()
@@ -531,7 +531,7 @@ void showTitleInfoLabel()
   lv_style_set_text_font(&stTitleLabelStyle, &ubuntu_18);
   labelTitle = lv_label_create(lv_scr_act());
   lv_label_set_text_fmt(labelTitle, "no data.. wait");
-  lv_label_set_long_mode(labelTitle, LV_LABEL_LONG_SCROLL_CIRCULAR);
+  //lv_label_set_long_mode(labelTitle, LV_LABEL_LONG_SCROLL_CIRCULAR);
   lv_style_set_text_color(&stTitleLabelStyle, colour);
   lv_obj_add_style(labelTitle, &stTitleLabelStyle, LV_PART_MAIN);
   lv_obj_set_pos(labelTitle, 90, 131);
@@ -683,6 +683,7 @@ void displaySetup()
 
 void audioSetup()
 {
+  //(false, 2);
   audio.setPinout(I2S_BCLK, I2S_LRCK, I2S_DOUT);
   audio.setVolume(volumeOut);    // Values from 0 to 21
 }
@@ -734,9 +735,12 @@ void setup() {
     audio_showstreamtitle(readConfig->GetError().c_str());
     return;
   }
+
+  //weatherService = new weather(readConfig->getWeatherLat(), readConfig->getWeatherLon(), readConfig->getWeatherToken());
   
   if (wifiSetup())  
   {
+
     if (listStations->getCountOfStations() > 0)
     {
       currentStation = 0;
@@ -746,6 +750,9 @@ void setup() {
       audio_showstation("Radio Stations not found!");
     }
     sTime->syncTime();
+    //weatherService->getweatherFromServer();
+    //if (!labelStationName) return;
+    //lv_label_set_text_fmt(labelStationName, "%s", weatherService->getErrStr().c_str());    
   }
 
   dispTimer = lv_timer_create(tickTimer, 1000,  NULL);

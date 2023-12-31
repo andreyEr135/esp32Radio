@@ -12,6 +12,7 @@
 
 #include "listOfStations.h"
 #include "sysTime.h"
+#include "weather.h"
 
 #define TIMEOUT_WIFI_CONNECT     10
 #define TIMEOUT_VOLUME_PAGE      10
@@ -26,9 +27,9 @@
 #define SD_SPI_FREQ 1000000
 
 // I2S Controller
-#define I2S_LRCK 35
-#define I2S_BCLK 36
-#define I2S_DOUT 37
+#define I2S_LRCK 10 // 35
+#define I2S_BCLK 12 //36
+#define I2S_DOUT 11 //37
 
 /* SD-Card Pins */
 #define SD_CS_PIN 41
@@ -58,6 +59,9 @@ extern String password;
 #define TIME_OFFSET 3
 class sysTime;
 extern sysTime *sTime;
+
+// Weather
+extern weather *weatherService;
 
 // LGFX
 class LGFX : public lgfx::LGFX_Device

@@ -26,16 +26,29 @@ bool sdConfig::readConfig()
   File dataFile = SD.open(configFile.c_str());
   DeserializationError error = deserializeJson(config, dataFile);
 
-  if (error) return false;
-  errorStr = (String)error.f_str();
+  if (error) 
+  {
+    errorStr = (String)error.f_str();
+    return false;
+  }
+  
 
   /* READ SSID */
-  const char* _ssid = config["ssid"];
-  ssid = String(_ssid);
+  const char* _str = config["ssid"];
+  ssid = String(_str);
 
   /* READ PASSWORD */
-  const char* _password = config["password"];
-  password = String(_password);
+  _str = config["password"];
+  password = String(_str);
+
+  /* READ WEATHER BLOCK */
+  _str = config["weather"]["token"];
+  weatherToken = String(_str);
+  
+  _str = config["weather"]["lat"];
+  sscanf(_str, "%f", &weatherLat);
+  _str = config["weather"]["lon"];
+  sscanf(_str, "%f", &weatherLon);
   
 
   /* READ STATIONS-LIST */
@@ -56,4 +69,18 @@ bool sdConfig::readConfig()
 String sdConfig::GetError()
 {
   return errorStr;   
+}
+
+String sdConfig::getWeatherToken()
+{
+  return weatherToken;
+
+}
+float sdConfig::getWeatherLat()
+{
+  return weatherLat;
+}
+float sdConfig::getWeatherLon()
+{
+  return weatherLon;
 }
