@@ -12,7 +12,8 @@ lv_obj_t *labelTime;
 lv_obj_t *iconWifi;
 
 // Volume label
-lv_obj_t *iconVolume;
+//lv_obj_t *iconVolume;
+lv_obj_t *volBtn;
 lv_style_t stVolLabelStyle;
 lv_obj_t *labelMainVolume;
 
@@ -25,11 +26,15 @@ lv_obj_t *labelVolumeTitle;
 lv_obj_t *sliderVolume;
 
 // Menu page and elements
+lv_obj_t *menuBtn;
 bool listDisplay;
 int tickStationList;
 lv_obj_t *pageStationsList;
 lv_obj_t *labelListTitle;
 lv_obj_t *menuOfStations;
+
+// Current station icon info
+lv_obj_t *currentIconRadio;
 
 
 

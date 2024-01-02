@@ -22,7 +22,8 @@ extern lv_obj_t *labelTime;
 extern lv_obj_t *iconWifi;
 
 // Volume info
-extern lv_obj_t *iconVolume;
+//extern lv_obj_t *iconVolume;
+extern lv_obj_t *volBtn;
 extern lv_style_t stVolLabelStyle;
 extern lv_obj_t *labelMainVolume;
 
@@ -34,11 +35,16 @@ extern lv_obj_t *labelVolumeTitle;
 extern lv_obj_t *sliderVolume;
 
 // Menu page and elements
+extern lv_obj_t *menuBtn;
 extern bool listDisplay;
 extern int tickStationList;
 extern lv_obj_t *pageStationsList;
 extern lv_obj_t *labelListTitle;
 extern lv_obj_t *menuOfStations;
+
+// Current station icon info
+extern lv_obj_t *currentIconRadio;
+
 
 
 

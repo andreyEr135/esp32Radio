@@ -57,3 +57,12 @@ void my_touch_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
     data->point.y = touchY;
   }
 }
+
+int getPosOfCurrentRadio()
+{
+  const int minPos = 15;
+  const int maxPos = 7 + 426 - 8;
+  int step = (maxPos - minPos) / (listStations->getCountOfStations() - 1);
+  if (currentStation == 0) return 15;
+  return (currentStation*step);
+}
