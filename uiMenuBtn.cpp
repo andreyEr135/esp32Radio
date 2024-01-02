@@ -18,7 +18,6 @@ static void eventMenuBtn(lv_event_t * e)
         HideMenuOfStations();
         tickStationList = 0;
       }
-      reshowMenuBtn();
     }
 }
 
