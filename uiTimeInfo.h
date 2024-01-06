@@ -11,6 +11,7 @@
 
 extern void showTimeStr();
 extern void reshowTimeStr();
+extern void reshowTimeInfo();
 
 
 #endif 

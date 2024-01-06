@@ -11,6 +11,7 @@ static void eventPlayPauseBtn(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * btn = lv_event_get_target(e);
     if(code == LV_EVENT_CLICKED) {
+      tickWeatherInfo = 0;
       audio.pauseResume();
       playPauseBtnChangeState(audio.isRunning());
     }
@@ -35,6 +36,12 @@ void showPlayPauseBtn()
   lv_obj_add_style(playPauseBtn, &style_pr, LV_STATE_PRESSED);
   lv_obj_add_event_cb(playPauseBtn, eventPlayPauseBtn, LV_EVENT_ALL, NULL);
   lv_obj_set_pos(playPauseBtn, 215, 200);
+}
+
+void hidePlayPauseBtn()
+{
+  lv_obj_del(playPauseBtn);
+  playPauseBtn = NULL;
 }
 
 void playPauseBtnChangeState(bool played)

@@ -11,6 +11,7 @@
 
 extern void showCurrentRadioStationIcon();
 extern void reshowCurrentRadioStationIcon();
+extern void hideCurrentRadioStationIcon();
 
 
 #endif 

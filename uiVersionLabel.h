@@ -10,6 +10,7 @@
 #include "uiModules.h"
 
 extern void showVersionStr();
+extern void hideVersionStr();
 
 
 #endif 

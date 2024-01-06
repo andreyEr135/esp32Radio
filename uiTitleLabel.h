@@ -11,6 +11,6 @@
 
 extern void showTitleInfoLabel();
 extern void writeTitle(const char *str);
-
+extern void reShowTitleInfoLabel();
 
 #endif 

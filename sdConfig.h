@@ -23,6 +23,9 @@ class sdConfig
     float getWeatherLat();
     float getWeatherLon();
 
+    bool writeWeatherInfo(String info);
+    String readWeatherInfo();
+
   private:
     bool initSD();
     String configFile;
@@ -35,6 +38,7 @@ class sdConfig
     float weatherLon;
   
 };
+
 
 
 

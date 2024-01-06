@@ -10,6 +10,7 @@
 #include "lvgl.h"
 #include <lvgl.h>
 
+#include "sdConfig.h"
 #include "listOfStations.h"
 #include "sysTime.h"
 #include "weather.h"
@@ -17,6 +18,10 @@
 #define TIMEOUT_WIFI_CONNECT     10
 #define TIMEOUT_VOLUME_PAGE      10
 #define TIMEOUT_STATIONLIST_PAGE 10
+
+extern int tickWeatherInfo;
+#define TIMEOUT_WEATHER_INFO     1*60
+#define TIMEOUT_WEATHER_GET      30*60
 
 
 #define VALUE_MAX_LENGTH 255
@@ -41,7 +46,16 @@
 #define screenWidth 480
 #define screenHeight 320
 
+// SD Config
+class sdConfig;
+extern sdConfig *readConfig;
+
+
+// Flag of main window
+extern bool mainWin;
+
 // StationInfo structure and variables
+extern bool listDisplay;
 class listOfStations;
 extern listOfStations *listStations;
 extern int currentStation;
@@ -62,6 +76,8 @@ extern sysTime *sTime;
 
 // Weather
 extern weather *weatherService;
+
+
 
 // LGFX
 class LGFX : public lgfx::LGFX_Device
@@ -167,6 +183,8 @@ class LGFX : public lgfx::LGFX_Device
 extern LGFX tft;
 
 // VolumeInfo
+extern int tickVolume;
+extern bool volDisplay;
 extern int prevVol;
 extern int volumeOut;
 
@@ -177,6 +195,7 @@ extern void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t
 extern void my_touch_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data);
 
 extern int getPosOfCurrentRadio();
+
 
 
 #endif 

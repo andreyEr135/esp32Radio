@@ -12,7 +12,11 @@
 #include <lvgl.h>
 
 #include "sdConfig.h"
+#include "uiMainPage.h"
+#include "uiWeatherPage.h"
+
 #include "listOfStations.h"
+
 #include "uiModules.h"
 #include "uiVolumeInfo.h"
 #include "uiVolumePage.h"
@@ -31,12 +35,12 @@
 #include "uiVolOffBtn.h"
 #include "uiRadioStationInfo.h"
 
-
-
-
-
-
-
+#include "uiCityName.h"
+#include "uiOblName.h"
+#include "uiConditionIcon.h"
+#include "uiTempLabel.h"
+#include "uiPressureLabel.h"
+#include "uiHumInfo.h"
 
 
 
@@ -45,7 +49,8 @@
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t buf[screenWidth * 10];
 
-sdConfig *readConfig;
+
+int tickWeather = 0;
 
 
 
@@ -71,6 +76,22 @@ void tickTimer(lv_timer_t * timer)
   playPauseBtnChangeState(audio.isRunning());
   wifiInfoReDraw();
   reshowTimeStr();
+
+  if (tickWeatherInfo == TIMEOUT_WEATHER_INFO) 
+  {
+    if (mainWin) showWeatherPage();
+    tickWeatherInfo = 0;
+  }
+
+  if (tickWeather > TIMEOUT_WEATHER_GET+1) tickWeather = 0;
+  if (tickWeather == 0)
+  {
+    weatherService->getWeather();
+    writeTemp();
+    if (!mainWin) reShowWeatherPage();
+  }
+  tickWeather++;
+  tickWeatherInfo++;
 }
 
 
@@ -82,14 +103,107 @@ void showBackground()
   lv_obj_set_pos(backgroundImg, 0, 0);  
 }
 
-void createMenu()
-{
-  showVolumeBtnInfo();
-  showMenuBtn();
-  showVolumeOffBtn();
-}
+// void createMenu()
+// {
+//   showVolumeBtnInfo();
+//   showMenuBtn();
+//   showVolumeOffBtn();
+// }
+
+// void showMainPage()
+// {
+//   mainWin = true;
+//   showTimeStr();
+
+//   showVersionStr();
+
+//   showTempLabel();  
+
+//   wifiInfoDraw();
+
+//   showNameStationLabel();
+
+//   showRadioStationInfo();
+
+//   showCurrentRadioStationIcon();
+
+//   showTitleInfoLabel();
+
+//   showPlayPauseIcon();
+
+//   showPrevBtn();
+
+//   showPlayPauseBtn();
+
+//   showNextBtn();
+
+//   createMenu();
+
+//   volDisplay = false;
+//   listDisplay = false;
+
+// }
+
+// void showMainPageAfterWeather()
+// {
+//   mainWin = true;
+//   hideNameCityLabel();
+//   hideNameOblLabel();
+//   conditionIconHide();
+//   hidePressureLabel();
+//   hideHumInfo();
+
+//   reshowTimeInfo();
+//   showVersionStr();
+//   reShowTempLabel();
+
+//   reShowNameStationLabel();
+//   showRadioStationInfo();
+//   showCurrentRadioStationIcon();
+//   reShowTitleInfoLabel();
+
+//   showPrevBtn();
+//   showPlayPauseBtn();
+//   showNextBtn();
+
+// }
+
+// void showWeatherPage()
+// {
+//   mainWin = false;
+//   hideVersionStr();
+//   hideRadioStationInfo();
+//   hideCurrentRadioStationIcon();
+
+//   hidePrevBtn();
+//   hidePlayPauseBtn();
+//   hideNextBtn();
 
 
+//   reshowTimeInfo();
+//   reShowNameStationLabel();
+//   reShowTitleInfoLabel();
+
+//   showNameCityLabel();
+
+//   showNameOblLabel();
+
+//   conditionIconDraw();
+
+//   reShowTempLabel();
+
+//   showPressureLabel();
+
+//   showHumInfo();
+// }
+
+// void reShowWeatherPage()
+// {
+//   writeCityName();
+//   writeOblName();
+//   writePressure();
+//   reShowHumInfo();
+// }
 
 
 // Create a slider and write its value on a label.
@@ -112,32 +226,8 @@ void CreateControls(void)
 
   showBackground();
 
-  showTimeStr();
-
-  showVersionStr();  
-
-  wifiInfoDraw();
-
-  showNameStationLabel();
-
-  showRadioStationInfo();
-
-  showCurrentRadioStationIcon();
-
-  showTitleInfoLabel();
-
-  showPlayPauseIcon();
-
-  showPrevBtn();
-
-  showPlayPauseBtn();
-
-  showNextBtn();
-
-  createMenu();
-
-  volDisplay = false;
-  listDisplay = false;
+  showMainPage();
+  
 
 }
 
@@ -218,7 +308,7 @@ void setup() {
     return;
   }
 
-  //weatherService = new weather(readConfig->getWeatherLat(), readConfig->getWeatherLon(), readConfig->getWeatherToken());
+  weatherService = new weather(readConfig->getWeatherLat(), readConfig->getWeatherLon(), readConfig->getWeatherToken());
   
   if (wifiSetup())  
   {
@@ -232,11 +322,12 @@ void setup() {
       audio_showstation("Radio Stations not found!");
     }
     sTime->syncTime();
-    //weatherService->getweatherFromServer();
+    
     //if (!labelStationName) return;
     //lv_label_set_text_fmt(labelStationName, "%s", weatherService->getErrStr().c_str());    
   }
 
+  tickWeatherInfo = 0;
   dispTimer = lv_timer_create(tickTimer, 1000,  NULL);
 
   delay(500); 

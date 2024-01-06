@@ -15,5 +15,10 @@ void showCurrentRadioStationIcon()
 void reshowCurrentRadioStationIcon()
 {  
   lv_obj_set_pos(currentIconRadio, getPosOfCurrentRadio(), 94);
-  
+}
+
+void hideCurrentRadioStationIcon()
+{
+  lv_obj_del(currentIconRadio);
+  currentIconRadio = NULL;
 }

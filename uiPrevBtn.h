@@ -10,5 +10,6 @@
 #include "uiModules.h"
 
 extern void showPrevBtn();
+extern void hidePrevBtn();
 
 #endif 

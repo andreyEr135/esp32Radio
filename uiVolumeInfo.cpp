@@ -2,6 +2,8 @@
 
 #include "uiVolumePage.h"
 #include "uiMenuPage.h"
+#include "uiMainPage.h"
+
 
 void volumeInfoReDraw()
 {
@@ -34,6 +36,8 @@ static void eventVolBtn(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     if(code == LV_EVENT_CLICKED) {
+        if (!mainWin) showMainPageAfterWeather();
+        tickWeatherInfo = 0;
         if (volDisplay) {
           HideVolume();
           tickVolume = 0;

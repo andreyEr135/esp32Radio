@@ -4,6 +4,12 @@
 #include <iostream>
 #include <string>
 
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
+
 #include <Arduino.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
@@ -14,24 +20,39 @@ class weather
 {
   public:
     weather(float _lat = 0, float _lon = 0, String _token = "");
-    void getweatherFromServer();
-    void getweatherFromLocal();
+    void getWeather();    
     bool isError();
     String getErrStr();
 
+    String getCity();
+    String getOblast();
+    String getUptime();
+    String getTemperature();
+    String getCondition();
+    String getPressure();
+    String getHumidity();
+
     
   private:
+    void getweatherFromServer();
+    void getweatherFromLocal();
     bool saveWeatherToLocal(); 
     String weatherInfo;
     float lat, lon;
     String token;
     HTTPClient http;
-    const char* serverName = "https://api.weather.yandex.ru/v2/forecast?";
+    const char* host = "api.weather.yandex.ru";
+    const char* url = "/v2/forecast?";
     bool error;
     String errStr;
 
-    int updateTime;
-    int temp;
+    String city;
+    String obl;
+    String uptime;
+    String temperature;
+    String condition;
+    String pressure;
+    String humidity;
     
 
 

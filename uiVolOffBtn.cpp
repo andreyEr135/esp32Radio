@@ -1,5 +1,6 @@
 #include "uiVolOffBtn.h"
 #include "uiVolumeInfo.h"
+#include "uiMainPage.h"
 
 static void eventVolOffBtn(lv_event_t * e)
 {
@@ -24,6 +25,8 @@ static void eventVolOffBtn(lv_event_t * e)
         lv_imgbtn_set_src(btn, LV_IMGBTN_STATE_RELEASED, NULL, &vol_offed, NULL);
       }
       audio.setVolume(volumeOut);
+      if (!mainWin) showMainPageAfterWeather();
+      tickWeatherInfo = 0;
       volumeInfoReDraw();
       prevVol = volumeOut;
     }

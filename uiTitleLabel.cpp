@@ -14,8 +14,25 @@ void showTitleInfoLabel()
   //lv_label_set_long_mode(labelTitle, LV_LABEL_LONG_SCROLL_CIRCULAR);
   lv_style_set_text_color(&stTitleLabelStyle, colour);
   lv_obj_add_style(labelTitle, &stTitleLabelStyle, LV_PART_MAIN);
-  lv_obj_set_pos(labelTitle, 20, 137);
+  if (mainWin)
+  {
+    lv_obj_set_pos(labelTitle, 20, 137);
+  } else
+  {
+    lv_obj_set_pos(labelTitle, 20, 104);
+  }
   lv_obj_set_size(labelTitle, 430, 49); 
+}
+
+void reShowTitleInfoLabel()
+{
+  if (mainWin)
+  {
+    lv_obj_set_pos(labelTitle, 20, 137);
+  } else
+  {
+    lv_obj_set_pos(labelTitle, 20, 104);
+  }
 }
 
 void writeTitle(const char *str)

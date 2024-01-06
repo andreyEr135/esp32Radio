@@ -10,5 +10,6 @@
 #include "uiModules.h"
 
 extern void showNextBtn();
+extern void hideNextBtn();
 
 #endif 

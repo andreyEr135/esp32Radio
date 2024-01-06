@@ -1,6 +1,8 @@
 #include "weather.h"
 
-#define ARDUINOJSON_SLOT_OFFSET_SIZE 100000
+#include "globals.h"
+
+using namespace std;
 
 weather::weather(float _lat, float _lon, String _token)
 {
@@ -12,114 +14,228 @@ weather::weather(float _lat, float _lon, String _token)
   else error = true;
 }
 
+void weather::getWeather()
+{
+  getweatherFromLocal();
+  if (uptime != 0)
+  {
+    unsigned long tsync;
+    sscanf(uptime.c_str(), "%lu", &tsync);
+
+    if (sTime->getTimeLong() - tsync > 30*60 )
+      getweatherFromServer();
+  } else getweatherFromServer();
+}
+
 void weather::getweatherFromServer()
 {
-	//String recv_token = "X-Yandex-API-Key:" + token;	
-	//WiFiClient client;		
-	// Sending POST request for Location Data.
-  char request[255];
-  memset(request, 0, sizeof(request));
-  sprintf(request, "%slat=%f&lon=%f&limit=1", serverName, lat, lon);
-  http.begin(request);
-  http.addHeader("X-Yandex-API-Key", token); // Adding Bearer token as HTTP header
+  String str_copy;
+  String str;
+  bool founded = false;
+
+  char buff[2500];
+
+	String _url = (String)url + "&lat=" + String(lat, 6) + "&lon=" + String(lon, 6) + "&limit=1";
+  WiFiClient client;
+  client.stop();
+  http.begin(client, host, 80, _url, true);
+	http.addHeader("X-Yandex-API-Key", token);
+  int httpCode = http.GET();
   
-  if (http.GET() > 0) {
-    char buff[512];
-    ssize_t sz = http.getStream().available();
-    ssize_t len = sz;
-    while (len > 0 || len == -1)
-    {
-      String str = "";
-      int beg = 0;
-      int end = 0;
-      // read up to 128 byte
-      int c = http.getStream().readBytes(buff, ((sz > sizeof(buff)) ? sizeof(buff) : sz));
-      if ((strstr(buff, "uptime") != 0) && (strstr(buff, "temp") != 0))
-      {
-        str = (String)buff;
-        beg = str.indexOf("uptime");
-        end = str.indexOf("temp");
-
-        str = str.substring(beg, end);
-        str = str.substring(8);
-        str.setCharAt(str.length() - 2, 0);
-        updateTime = str.toInt();
-        errStr = str; 
-      }
-
-      if ((strstr(buff, "temp") != 0) && (strstr(buff, "feels_like") != 0))
-      {
-        errStr = "temp and feels_like founded!"; 
-        str = (String)buff;
-        beg = str.indexOf("temp");
-        end = str.indexOf("feels_like");
-
-        str = str.substring(beg);
-        str = str.substring(6);
-        str.setCharAt(10, 0);
-        //updateTime = str.toInt();
-        errStr = str; 
-      }
-
-
-    
-      if (len > 0) {
-        len -= c;
-      }
-    }
-    //http.getStream().readBytes(buff, 32);
-    //errStr = (String)buff;    
-          // выводим ответ сервера
-      //StaticJsonDocument<16384> readData;
-      //StaticJsonDocument<64> filter;
-      //filter["fact"][0]["temp"] = true;
-      //filter["fact"][1]["feels_like"] = true;
-      //DynamicJsonDocument readData(2000);
-      //String res = "{\"now\": 1703707370,\"now_dt\": \"2023-12-27T20:02:50.600975Z\",\"info\": {\"n\": true,\"geoid\": 10747,\"url\": \"https://yandex.ru/pogoda/10747?lat=55.4242&lon=37.5547\",\"lat\": 55.4242,\"lon\": 37.5547,\"tzinfo\": {\"name\": \"Europe/Moscow\",\"abbr\": \"MSK\",\"dst\": false,\"offset\": 10800},\"def_pressure_mm\": 746,\"def_pressure_pa\": 994,\"slug\": \"10747\",\"zoom\": 10,\"nr\": true,\"ns\": true,\"nsr\": true,\"p\": false,\"f\": true,\"_h\": false}}";
-      //http.getStream().find("\"info\":{");
-      //do {
-      //  DeserializationError error = deserializeJson(readData, http.getStream(), DeserializationOption::Filter(filter));    
-      //  if (error) 
-      //  {
-      //    errStr = (String)error.f_str();
-      //  } else {
-      //    int temp = readData["feels_like"];
-      //    char s[15]; sprintf(s, "%d", temp);
-      //    errStr = (String)s + "C";
-          //JsonObject tzinfo = readData["tzinfo"];
-          //const char* tzinfo_name = tzinfo["name"];
-          //errStr = tzinfo_name;
-      //  }
-      //} while (http.getStream().findUntil(",","}\"geo_object\""));
-      
-      
-  } else
+  if (httpCode != 200)
   {
-    errStr = token;
-  }  
-  // Send HTTP POST request
-  /*httpResponseCode = http.POST(httpRequestData);
-  Serial.print("HTTP Response code: ");
-  Serial.println(httpResponseCode);
+    error = true;
+    errStr = "No weather data";
+    return;
+  }
+  ssize_t sz = http.getStream().available();
+  if (sz < sizeof(buff))
+  {
+    error = true;
+    errStr = "Get data weather error";
+    return;
+  } 
   
-  if (httpResponseCode>0) {
-      payload = http.getString();
-      Serial.println(payload);
-  }*/
-// Free resources
-  http.end();
+  int c = http.getStream().readBytes(buff, ((sz > sizeof(buff)) ? sizeof(buff) : sz));
+    
+  str = (String)buff;
 
+  if (str.indexOf("geo_object") > 0)
+  {
+    founded = false;
+    str_copy = str;
+    str_copy = str_copy.substring(str_copy.indexOf("geo_object"));
+    
+    if (str_copy.indexOf("province") > 0)
+    {
+        if (str_copy.indexOf("name") > 0)
+        {
+            str_copy = str_copy.substring(str_copy.indexOf("name")+7);    
+            if (str_copy.indexOf('\"') > 0)
+            { 
+                str_copy = str_copy.substring(0,str_copy.indexOf('\"'));    
+                city = str_copy;   
+                str_copy = "";
+                founded = true;
+            }
+        } 
+    } 
+  } 
+  if (str.indexOf("province") > 0)
+  {
+    founded = false;
+    str_copy = str;
+    str_copy = str_copy.substring(str_copy.indexOf("province"));
+    if (str_copy.indexOf("name") > 0)
+    {
+        str_copy = str_copy.substring(str_copy.indexOf("name")+7);
+        if (str_copy.indexOf('\"') > 0)
+        {
+            str_copy = str_copy.substring(0,str_copy.indexOf('\"'));
+            obl = str_copy;
+            str_copy = "";
+            founded = true;
+        } 
+    } 
+  }
+  if (str.indexOf("fact") > 0)
+  {
+    founded = false;
+    str_copy = str;
+    str_copy = str_copy.substring(str_copy.indexOf("fact"));
+    
+    if (str_copy.indexOf("uptime") > 0)
+    {
+        str_copy = str_copy.substring(str_copy.indexOf("uptime")+8);
+        if (str_copy.indexOf(',') > 0)
+        {
+            str_copy = str_copy.substring(0,str_copy.indexOf(','));
+            uptime = str_copy;
+            str_copy = "";
+            founded = true;
+        } 
+    } 
+  }
+  if (str.indexOf("fact") > 0)
+  {
+    founded = false;
+    str_copy = str;
+    str_copy = str_copy.substring(str_copy.indexOf("fact"));
+    if (str_copy.indexOf("temp") > 0)
+    {
+        str_copy = str_copy.substring(str_copy.indexOf("temp")+6);
+        if (str_copy.indexOf(',') > 0)
+        {
+            str_copy = str_copy.substring(0,str_copy.indexOf(','));
+            temperature = str_copy;
+            str_copy = "";
+            founded = true;
+        } 
+    } 
+  }
+  if (str.indexOf("fact") > 0)
+  {
+    founded = false;
+    str_copy = str;
+    str_copy = str_copy.substring(str_copy.indexOf("fact"));
+
+    if (str_copy.indexOf("condition") > 0)
+    { 
+        str_copy = str_copy.substring(str_copy.indexOf("condition")+12);
+        if (str_copy.indexOf('\"') > 0)
+        {
+            str_copy = str_copy.substring(0,str_copy.indexOf('\"'));
+            condition = str_copy;
+            str_copy = "";
+            founded = true;
+        } 
+    } 
+  }
+  
+  if (str.indexOf("fact") > 0)
+  {
+    founded = false;
+    str_copy = str;
+    str_copy = str_copy.substring(str_copy.indexOf("fact"));
+
+    if (str_copy.indexOf("pressure_mm") > 0)
+    {
+        str_copy = str_copy.substring(str_copy.indexOf("pressure_mm")+13);
+        if (str_copy.indexOf(',') > 0)
+        {
+            str_copy = str_copy.substring(0,str_copy.indexOf(','));
+            pressure = str_copy;
+            str_copy = "";
+            founded = true;
+        } 
+    } 
+  }
+  if (str.indexOf("fact") > 0)
+  {
+    founded = false;
+    str_copy = str;
+    str_copy = str_copy.substring(str_copy.indexOf("fact"));
+
+    if (str_copy.indexOf("humidity") > 0)
+    { 
+        str_copy = str_copy.substring(str_copy.indexOf("humidity")+10);
+        if (str_copy.indexOf(',') > 0)
+        {
+            str_copy = str_copy.substring(0,str_copy.indexOf(','));
+            humidity = str_copy;
+            str_copy = "";
+            founded = true;
+        } 
+    } 
+  }
+
+  http.end();
+  saveWeatherToLocal();
 }
+
 void weather::getweatherFromLocal()
 {
-
+  String strRead = readConfig->readWeatherInfo();
+  
+  String str = strRead;
+  while (str != "")
+  {
+    if (str.indexOf(';') > 0)
+    {
+      String param = str.substring(0, str.indexOf(';'));
+      str = str.substring(str.indexOf(';')+1);
+      if (param.indexOf("uptime=") >=0)
+      {
+        uptime = param.substring(7);
+      } else if (param.indexOf("city=") >=0)
+      {
+        city = param.substring(5);
+      } else if (param.indexOf("obl=") >=0)
+      {
+        obl = param.substring(4);
+      } else if (param.indexOf("temp=") >=0)
+      {
+        temperature = param.substring(5);
+      } else if (param.indexOf("cond=") >=0)
+      {
+        condition = param.substring(5);
+      } else if (param.indexOf("pressure=") >=0)
+      {
+        pressure = param.substring(9);
+      } else if (param.indexOf("hum=") >=0)
+      {
+        humidity = param.substring(4);
+      }
+    } else break;
+  }
 }
 
     
 bool weather::saveWeatherToLocal()
 {
-
-  return true;
+  String strRec = "uptime=" + uptime + ";city=" + city + ";obl=" + obl + ";temp=" + temperature + ";cond=" + condition + ";pressure=" + pressure + ";hum=" + humidity + ";";
+  bool res = readConfig->writeWeatherInfo(strRec);
+  return res;
 }
 
 bool weather::isError()
@@ -130,5 +246,34 @@ bool weather::isError()
 String weather::getErrStr()
 {
   return errStr;
+}
+
+String weather::getCity()
+{
+  return city;
+}
+String weather::getOblast()
+{
+  return obl;
+}
+String weather::getUptime()
+{
+  return uptime;
+}
+String weather::getTemperature()
+{
+  return temperature;
+}
+String weather::getCondition()
+{
+  return condition;
+}
+String weather::getPressure()
+{
+  return pressure;
+}
+String weather::getHumidity()
+{
+  return humidity;
 }
 

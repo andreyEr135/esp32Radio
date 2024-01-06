@@ -25,3 +25,14 @@ String sysTime::getTime()
   res = (String)str;
   return res;
 }
+
+unsigned long sysTime::getTimeLong()
+{
+  time_t now;
+  struct tm timeinfo;
+  if(!getLocalTime(&timeinfo)) {
+    return 0;
+  }
+  time(&now);
+  return now;
+}

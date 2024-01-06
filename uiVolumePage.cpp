@@ -65,7 +65,8 @@ void CreateVolumePage()
 
   pageVolume = lv_obj_create(lv_scr_act()); /*Create a parent object on the current screen*/
   lv_obj_set_size(pageVolume, 300, 90);
-  lv_obj_align(pageVolume, LV_ALIGN_CENTER, 0, 0);
+  lv_obj_set_pos(pageVolume, 100, 100);
+  //lv_obj_align(pageVolume, LV_ALIGN_CENTER, 0, 0);
   lv_obj_add_style(pageVolume, &style, 0);
 
   sliderVolume = lv_slider_create(pageVolume);

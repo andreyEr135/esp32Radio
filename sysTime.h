@@ -13,6 +13,7 @@ class sysTime
     sysTime(int _offset = 0);
     void syncTime();
     String getTime();
+    unsigned long getTimeLong();
 
     
   private:

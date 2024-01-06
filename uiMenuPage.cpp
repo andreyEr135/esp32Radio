@@ -62,7 +62,7 @@ void CreateMenuOfStations()
   lv_style_set_text_font(&stLabelStyle, &ubuntu_18);
   labelListTitle = lv_label_create(pageStationsList);
   lv_label_set_text_fmt(labelListTitle, "Список станций");
-  lv_obj_set_pos(labelListTitle, 90, 0);
+  lv_obj_set_pos(labelListTitle, 160, 0);
   lv_style_set_text_color(&stLabelStyle, colourText);
   lv_obj_add_style(labelListTitle, &stLabelStyle, LV_PART_MAIN);
 

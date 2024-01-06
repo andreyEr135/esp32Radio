@@ -84,3 +84,42 @@ float sdConfig::getWeatherLon()
 {
   return weatherLon;
 }
+
+bool sdConfig::writeWeatherInfo(String info)
+{
+  File weatherFile;
+
+  if (SD.exists("/weather.txt")) SD.remove("/weather.txt");
+
+  weatherFile = SD.open("/weather.txt", FILE_WRITE);
+
+  // if the file opened okay, write to it:
+  if (weatherFile) {
+    weatherFile.println(info.c_str());
+    // close the file:
+    weatherFile.close();
+    return true;
+  } else {
+    return false;
+  }
+  return false;
+}
+
+String sdConfig::readWeatherInfo()
+{
+  String res = "";
+  File weatherFile;
+  weatherFile = SD.open("/weather.txt");
+
+  // if the file opened okay, write to it:
+  if (!weatherFile) return res;
+
+  while (weatherFile.available()) {
+    res = weatherFile.readString();
+  }
+  
+  // close the file:
+  weatherFile.close();
+  return res;
+
+}

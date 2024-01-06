@@ -10,6 +10,7 @@
 #include "uiModules.h"
 
 extern void showNameStationLabel();
+extern void reShowNameStationLabel();
 extern void writeStationName(const char *str);
 
 

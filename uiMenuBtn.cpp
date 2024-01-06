@@ -1,13 +1,15 @@
 #include "uiMenuBtn.h"
 #include "uiMenuPage.h"
 #include "uiVolumePage.h"
-
+#include "uiMainPage.h"
 
 
 static void eventMenuBtn(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     if(code == LV_EVENT_CLICKED) {
+      if (!mainWin) showMainPageAfterWeather();
+      tickWeatherInfo = 0;
       if (!listDisplay) {
         if (volDisplay) HideVolume();
         CreateMenuOfStations();

@@ -1,6 +1,17 @@
 #include "globals.h"
 
+#include "uiMainPage.h"
+#include "uiVolumePage.h"
+
+// SD Config
+sdConfig *readConfig;
+
+// Flag of main window
+bool mainWin;
+int tickWeatherInfo;
+
 // StationInfo structure and variables
+bool listDisplay;
 listOfStations *listStations;
 int currentStation = 0;
 // extern int countOfStations = 0;
@@ -26,6 +37,8 @@ weather *weatherService;
 LGFX tft;
 
 // Volume Info
+int tickVolume;
+bool volDisplay;
 int prevVol;
 int volumeOut;
 
@@ -55,6 +68,28 @@ void my_touch_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
     data->state = LV_INDEV_STATE_PR;
     data->point.x = touchX;
     data->point.y = touchY;
+    if ( (!volDisplay) && (!listDisplay) )
+    {
+      if (data->point.y < 269)
+        if (!mainWin) showMainPageAfterWeather();
+    } else
+    {
+      if (volDisplay)
+      {
+        if (data->point.y > 269) {
+          tickWeatherInfo = 0;
+          return;
+        }
+        if ( ( (data->point.x > 100) && (data->point.x < 100 + 300) ) && ( (data->point.y > 100) && (data->point.y < 100+90) ) ) 
+        {
+          tickWeatherInfo = 0;
+          return;
+        } 
+        HideVolume();
+        tickVolume = 0;
+      }
+    }
+    tickWeatherInfo = 0;
   }
 }
 

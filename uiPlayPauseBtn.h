@@ -10,6 +10,7 @@
 #include "uiModules.h"
 
 extern void showPlayPauseBtn();
+extern void hidePlayPauseBtn();
 extern void playPauseBtnChangeState(bool played);
 
 

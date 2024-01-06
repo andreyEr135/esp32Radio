@@ -10,6 +10,6 @@
 #include "uiModules.h"
 
 extern void showRadioStationInfo();
-
+extern void hideRadioStationInfo();
 
 #endif 
