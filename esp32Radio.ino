@@ -53,8 +53,6 @@ static lv_color_t buf[screenWidth * 10];
 int tickWeather = 0;
 
 
-
-
 void tickTimer(lv_timer_t * timer)
 {
   if ((volDisplay) && (tickVolume > TIMEOUT_VOLUME_PAGE))
@@ -102,109 +100,6 @@ void showBackground()
   lv_img_set_src(backgroundImg, &background);
   lv_obj_set_pos(backgroundImg, 0, 0);  
 }
-
-// void createMenu()
-// {
-//   showVolumeBtnInfo();
-//   showMenuBtn();
-//   showVolumeOffBtn();
-// }
-
-// void showMainPage()
-// {
-//   mainWin = true;
-//   showTimeStr();
-
-//   showVersionStr();
-
-//   showTempLabel();  
-
-//   wifiInfoDraw();
-
-//   showNameStationLabel();
-
-//   showRadioStationInfo();
-
-//   showCurrentRadioStationIcon();
-
-//   showTitleInfoLabel();
-
-//   showPlayPauseIcon();
-
-//   showPrevBtn();
-
-//   showPlayPauseBtn();
-
-//   showNextBtn();
-
-//   createMenu();
-
-//   volDisplay = false;
-//   listDisplay = false;
-
-// }
-
-// void showMainPageAfterWeather()
-// {
-//   mainWin = true;
-//   hideNameCityLabel();
-//   hideNameOblLabel();
-//   conditionIconHide();
-//   hidePressureLabel();
-//   hideHumInfo();
-
-//   reshowTimeInfo();
-//   showVersionStr();
-//   reShowTempLabel();
-
-//   reShowNameStationLabel();
-//   showRadioStationInfo();
-//   showCurrentRadioStationIcon();
-//   reShowTitleInfoLabel();
-
-//   showPrevBtn();
-//   showPlayPauseBtn();
-//   showNextBtn();
-
-// }
-
-// void showWeatherPage()
-// {
-//   mainWin = false;
-//   hideVersionStr();
-//   hideRadioStationInfo();
-//   hideCurrentRadioStationIcon();
-
-//   hidePrevBtn();
-//   hidePlayPauseBtn();
-//   hideNextBtn();
-
-
-//   reshowTimeInfo();
-//   reShowNameStationLabel();
-//   reShowTitleInfoLabel();
-
-//   showNameCityLabel();
-
-//   showNameOblLabel();
-
-//   conditionIconDraw();
-
-//   reShowTempLabel();
-
-//   showPressureLabel();
-
-//   showHumInfo();
-// }
-
-// void reShowWeatherPage()
-// {
-//   writeCityName();
-//   writeOblName();
-//   writePressure();
-//   reShowHumInfo();
-// }
-
 
 // Create a slider and write its value on a label.
 void CreateControls(void)
@@ -293,10 +188,9 @@ void setup() {
   listStations = new listOfStations();
   sTime = new sysTime(TIME_OFFSET);
  
-  displaySetup();
- 
-  volumeOut = 10;
+  displaySetup();  
 
+  volumeOut = readConfig->readOldVolume();
   audioSetup();
 
   CreateControls();
@@ -308,6 +202,8 @@ void setup() {
     return;
   }
 
+  
+
   weatherService = new weather(readConfig->getWeatherLat(), readConfig->getWeatherLon(), readConfig->getWeatherToken());
   
   if (wifiSetup())  
@@ -315,7 +211,8 @@ void setup() {
 
     if (listStations->getCountOfStations() > 0)
     {
-      currentStation = 0;
+      currentStation = readConfig->readOldStation();
+      reshowCurrentRadioStationIcon();
       audio.connecttohost(listStations->getUrlOfStation(listStations->getNameOfStations(currentStation)).c_str());
     }  else
     {

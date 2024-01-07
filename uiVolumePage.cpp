@@ -99,6 +99,7 @@ void HideVolume()
   labelVolumeTitle = NULL;
   pageVolume = NULL;
   volDisplay = false;
+  readConfig->writeCurrentVolume(volumeOut);
 }
 
 

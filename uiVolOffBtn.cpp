@@ -28,6 +28,7 @@ static void eventVolOffBtn(lv_event_t * e)
       if (!mainWin) showMainPageAfterWeather();
       tickWeatherInfo = 0;
       volumeInfoReDraw();
+      readConfig->writeCurrentVolume(volumeOut);
       prevVol = volumeOut;
     }
 }

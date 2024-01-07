@@ -123,3 +123,81 @@ String sdConfig::readWeatherInfo()
   return res;
 
 }
+
+bool sdConfig::writeCurrentStation(int id)
+{
+  File stationFile;
+
+  if (SD.exists("/station.txt")) SD.remove("/station.txt");
+
+  stationFile = SD.open("/station.txt", FILE_WRITE);
+
+  // if the file opened okay, write to it:
+  if (stationFile) {
+    stationFile.println(id);
+    // close the file:
+    stationFile.close();
+    return true;
+  } else {
+    return false;
+  }
+  return false;
+
+}
+
+int sdConfig::readOldStation()
+{
+  int res = 0;
+  File stationFile;
+  stationFile = SD.open("/station.txt");
+
+  // if the file opened okay, write to it:
+  if (!stationFile) return res;
+
+  while (stationFile.available()) {
+    res = stationFile.readString().toInt();
+  }
+  
+  // close the file:
+  stationFile.close();
+  return res;
+}
+
+bool sdConfig::writeCurrentVolume(int vol)
+{
+  File volumeFile;
+
+  if (SD.exists("/volume.txt")) SD.remove("/volume.txt");
+
+  volumeFile = SD.open("/volume.txt", FILE_WRITE);
+
+  // if the file opened okay, write to it:
+  if (volumeFile) {
+    volumeFile.println(vol);
+    // close the file:
+    volumeFile.close();
+    return true;
+  } else {
+    return false;
+  }
+  return false;
+
+}
+
+int sdConfig::readOldVolume()
+{
+  int res = 10;
+  File volumeFile;
+  volumeFile = SD.open("/volume.txt");
+
+  // if the file opened okay, write to it:
+  if (!volumeFile) return res;
+
+  while (volumeFile.available()) {
+    res = volumeFile.readString().toInt();
+  }
+  
+  // close the file:
+  volumeFile.close();
+  return res;
+}

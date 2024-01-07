@@ -69,7 +69,7 @@ void showVolumeBtn()
 void showVolumeCount()
 {
   lv_style_init(&stVolLabelStyle);
-  lv_style_set_text_font(&stVolLabelStyle, &ubuntu_24);
+  lv_style_set_text_font(&stVolLabelStyle, &ubuntu_26);
   lv_color_t colour;
   if (volumeOut == 0) 
     colour = lv_color_hex(0xA1A1A1);    
@@ -80,7 +80,7 @@ void showVolumeCount()
   labelMainVolume = lv_label_create(lv_scr_act());
   lv_label_set_text_fmt(labelMainVolume, "%d", volumeOut);
   
-  lv_obj_set_pos(labelMainVolume, 45, 282);
+  lv_obj_set_pos(labelMainVolume, 45, 277);
   lv_obj_add_style(labelMainVolume, &stVolLabelStyle, LV_PART_MAIN);
 }
 

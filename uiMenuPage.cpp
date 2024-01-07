@@ -15,6 +15,7 @@ static void eventListClickedHandler(lv_event_t * e)
     reshowCurrentRadioStationIcon();
     audio.connecttohost(listStations->getUrlOfStation((String)lv_list_get_btn_text(menuOfStations, btn)).c_str());   
     HideMenuOfStations();
+    readConfig->writeCurrentStation(currentStation);
   }
 }
 

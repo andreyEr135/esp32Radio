@@ -26,6 +26,12 @@ class sdConfig
     bool writeWeatherInfo(String info);
     String readWeatherInfo();
 
+    bool writeCurrentStation(int id);
+    int readOldStation();
+
+    bool writeCurrentVolume(int vol);
+    int  readOldVolume();
+
   private:
     bool initSD();
     String configFile;
