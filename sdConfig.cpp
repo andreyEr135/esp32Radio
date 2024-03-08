@@ -22,7 +22,7 @@ bool sdConfig::initSD()
 bool sdConfig::readConfig()
 {
   if (!sdInited) return false;
-  DynamicJsonDocument config(1000);
+  DynamicJsonDocument config(2500);
   File dataFile = SD.open(configFile.c_str());
   DeserializationError error = deserializeJson(config, dataFile);
 

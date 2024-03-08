@@ -42,6 +42,9 @@
 #include "uiPressureLabel.h"
 #include "uiHumInfo.h"
 
+#include "uiVoltageLabel.h"
+
+
 
 
 
@@ -51,8 +54,9 @@ static lv_color_t buf[screenWidth * 10];
 
 
 int tickWeather = 0;
+int tickBattery = 0;
 
-
+//every 1 sec
 void tickTimer(lv_timer_t * timer)
 {
   if ((volDisplay) && (tickVolume > TIMEOUT_VOLUME_PAGE))
@@ -88,8 +92,15 @@ void tickTimer(lv_timer_t * timer)
     writeTemp();
     if (!mainWin) reShowWeatherPage();
   }
+
+  if (tickBattery > 5)
+  {
+    writeVoltage();
+    tickBattery = 0;
+  }
   tickWeather++;
   tickWeatherInfo++;
+  tickBattery++;
 }
 
 
@@ -187,6 +198,9 @@ void setup() {
   readConfig = new sdConfig();
   listStations = new listOfStations();
   sTime = new sysTime(TIME_OFFSET);
+
+  battery = new batteryStatus();
+  
  
   displaySetup();  
 
@@ -225,16 +239,26 @@ void setup() {
   }
 
   tickWeatherInfo = 0;
-  dispTimer = lv_timer_create(tickTimer, 1000,  NULL);
+  dispTimer = lv_timer_create(tickTimer, 5,  NULL);
 
+  xTaskCreatePinnedToCore(Task_Audio, "Task_Audio", 10240, NULL, 3, NULL, 0);
   delay(500); 
 
   playPauseBtnChangeState(audio.isRunning());
 }
 
+void Task_Audio(void *pvParameters) // This is a task.
+{
+  while (true)
+  {
+    audio.loop();
+    delay(1);
+  }
+}
+  
+
 
 void loop() {
-  audio.loop();
   lv_timer_handler();  
 }
 

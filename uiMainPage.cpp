@@ -7,6 +7,7 @@
 #include "uiCurrentStationIcon.h"
 #include "uiStationName.h"
 #include "uiTitleLabel.h"
+#include "uiVoltageLabel.h"
 #include "uiWifiInfo.h"
 #include "uiTimeInfo.h"
 #include "uiPlayPauseBtn.h"
@@ -38,6 +39,8 @@ void showMainPage()
   showTimeStr();
 
   showVersionStr();
+
+  showVoltageLabel();
 
   showTempLabel();  
 

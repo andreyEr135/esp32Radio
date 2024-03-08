@@ -41,8 +41,8 @@ class weather
     float lat, lon;
     String token;
     HTTPClient http;
-    const char* host = "api.weather.yandex.ru";
-    const char* url = "/v2/forecast?";
+    const char* host = "api.openweathermap.org";
+    const char* url = "/data/2.5/weather?&units=metric&lang=ru";
     bool error;
     String errStr;
 

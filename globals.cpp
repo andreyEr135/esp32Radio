@@ -33,6 +33,9 @@ sysTime *sTime;
 // Weather
 weather *weatherService;
 
+// Battery status
+batteryStatus *battery;
+
 // LGFX
 LGFX tft;
 

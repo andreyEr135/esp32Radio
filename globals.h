@@ -14,6 +14,8 @@
 #include "listOfStations.h"
 #include "sysTime.h"
 #include "weather.h"
+#include "batteryStatus.h"
+
 
 #define TIMEOUT_WIFI_CONNECT     10
 #define TIMEOUT_VOLUME_PAGE      10
@@ -76,6 +78,10 @@ extern sysTime *sTime;
 
 // Weather
 extern weather *weatherService;
+
+// Battery status
+class batteryStatus;
+extern batteryStatus *battery;
 
 
 

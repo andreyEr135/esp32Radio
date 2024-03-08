@@ -3,6 +3,7 @@
 #include "globals.h"
 
 using namespace std;
+String httpGETRequest(const char* serverName);
 
 weather::weather(float _lat, float _lon, String _token)
 {
@@ -35,11 +36,12 @@ void weather::getweatherFromServer()
 
   char buff[2500];
 
-	String _url = (String)url + "&lat=" + String(lat, 6) + "&lon=" + String(lon, 6) + "&limit=1";
+	String _url = (String)url + "&lat=" + String(lat, 4) + "&lon=" + String(lon, 4) + "&appid=" + token;
+
   WiFiClient client;
   client.stop();
+
   http.begin(client, host, 80, _url, true);
-	http.addHeader("X-Yandex-API-Key", token);
   int httpCode = http.GET();
   
   if (httpCode != 200)
@@ -47,146 +49,157 @@ void weather::getweatherFromServer()
     error = true;
     errStr = "No weather data";
     return;
-  }
-  ssize_t sz = http.getStream().available();
-  if (sz < sizeof(buff))
-  {
-    error = true;
-    errStr = "Get data weather error";
-    return;
-  } 
-  
-  int c = http.getStream().readBytes(buff, ((sz > sizeof(buff)) ? sizeof(buff) : sz));
+  }  
     
+  ssize_t sz = http.getStream().available();  
+  int c = http.getStream().readBytes(buff, ((sz > sizeof(buff)) ? sizeof(buff) : sz));
   str = (String)buff;
 
-  if (str.indexOf("geo_object") > 0)
+  if (str == "")
   {
-    founded = false;
-    str_copy = str;
-    str_copy = str_copy.substring(str_copy.indexOf("geo_object"));
-    
-    if (str_copy.indexOf("province") > 0)
-    {
-        if (str_copy.indexOf("name") > 0)
-        {
-            str_copy = str_copy.substring(str_copy.indexOf("name")+7);    
-            if (str_copy.indexOf('\"') > 0)
-            { 
-                str_copy = str_copy.substring(0,str_copy.indexOf('\"'));    
-                city = str_copy;   
-                str_copy = "";
-                founded = true;
-            }
-        } 
-    } 
+    error = true;
+    errStr = "No data";
+    return;
+  }
+ 
+  if (str.indexOf("weather") > 0)
+  {
+      founded = false;
+      str_copy = str;
+      str_copy = str_copy.substring(str_copy.indexOf("weather"));
+      
+      if (str_copy.indexOf("main") > 0)
+      {
+          str_copy = str_copy.substring(str_copy.indexOf("main")+7);
+          if (str_copy.indexOf('\"') > 0)
+          {
+              str_copy = str_copy.substring(0,str_copy.indexOf('\"'));
+              if (str_copy == "Clear") condition = "clear";
+              else if (str_copy == "Clouds") condition = "cloudy";
+              else if (str_copy == "Rain") condition = "rain";
+              else if (str_copy == "Snow") condition = "snow";
+              else if (str_copy == "Thunderstorm") condition = "thunderstorm";              
+              str_copy = "";
+              founded = true;
+          }
+      } 
+  }
+
+  if (str.indexOf("weather") > 0)
+  {
+      founded = false;
+      str_copy = str;
+      str_copy = str_copy.substring(str_copy.indexOf("weather"));
+      
+      if (str_copy.indexOf("description") > 0)
+      {
+          str_copy = str_copy.substring(str_copy.indexOf("description")+14);
+          if ((int)str_copy.indexOf('\"') > 0)
+          {
+              str_copy = str_copy.substring(0,str_copy.indexOf('\"'));
+              if (str_copy == "ясно") condition = "clear";
+              else if (str_copy == "рассеянные облака") condition = "partly-cloudy";
+              else if (str_copy == "пасмурная облачность") condition = "overcast";
+              else if (str_copy == "легкий дождь, дождь") condition = "rain";
+              else if (str_copy == "ливень дождь") condition = "heavy-rain";
+              else if (str_copy == "легкий дождь") condition = "light-rain";
+              else if (str_copy == "сильный ливень") condition = "showers";
+              else if (str_copy == "мокрый снег") condition = "wet-snow";
+
+              else if (str_copy == "легкий снег") condition = "light-snow";
+              else if (str_copy == "снег") condition = "snow";
+              else if (str_copy == "сильный снегопад") condition = "snow-showers";
+
+              else if (str_copy == "ледяной дождь") condition = "hail";
+              else if (str_copy == "гроза") condition = "thunderstorm";
+              else if (str_copy == "гроза с дождем") condition = "thunderstorm-with-rain";
+              else if (str_copy == "гроза с сильным дождем") condition = "thunderstorm-with-hail";
+              str_copy = "";
+              founded = true;
+          }
+      } 
   } 
-  if (str.indexOf("province") > 0)
-  {
-    founded = false;
-    str_copy = str;
-    str_copy = str_copy.substring(str_copy.indexOf("province"));
-    if (str_copy.indexOf("name") > 0)
-    {
-        str_copy = str_copy.substring(str_copy.indexOf("name")+7);
-        if (str_copy.indexOf('\"') > 0)
-        {
-            str_copy = str_copy.substring(0,str_copy.indexOf('\"'));
-            obl = str_copy;
-            str_copy = "";
-            founded = true;
-        } 
-    } 
-  }
-  if (str.indexOf("fact") > 0)
-  {
-    founded = false;
-    str_copy = str;
-    str_copy = str_copy.substring(str_copy.indexOf("fact"));
-    
-    if (str_copy.indexOf("uptime") > 0)
-    {
-        str_copy = str_copy.substring(str_copy.indexOf("uptime")+8);
-        if (str_copy.indexOf(',') > 0)
-        {
-            str_copy = str_copy.substring(0,str_copy.indexOf(','));
-            uptime = str_copy;
-            str_copy = "";
-            founded = true;
-        } 
-    } 
-  }
-  if (str.indexOf("fact") > 0)
-  {
-    founded = false;
-    str_copy = str;
-    str_copy = str_copy.substring(str_copy.indexOf("fact"));
-    if (str_copy.indexOf("temp") > 0)
-    {
-        str_copy = str_copy.substring(str_copy.indexOf("temp")+6);
-        if (str_copy.indexOf(',') > 0)
-        {
-            str_copy = str_copy.substring(0,str_copy.indexOf(','));
-            temperature = str_copy;
-            str_copy = "";
-            founded = true;
-        } 
-    } 
-  }
-  if (str.indexOf("fact") > 0)
-  {
-    founded = false;
-    str_copy = str;
-    str_copy = str_copy.substring(str_copy.indexOf("fact"));
-
-    if (str_copy.indexOf("condition") > 0)
-    { 
-        str_copy = str_copy.substring(str_copy.indexOf("condition")+12);
-        if (str_copy.indexOf('\"') > 0)
-        {
-            str_copy = str_copy.substring(0,str_copy.indexOf('\"'));
-            condition = str_copy;
-            str_copy = "";
-            founded = true;
-        } 
-    } 
-  }
   
-  if (str.indexOf("fact") > 0)
+  if (str.indexOf("temp") > 0)
   {
-    founded = false;
-    str_copy = str;
-    str_copy = str_copy.substring(str_copy.indexOf("fact"));
-
-    if (str_copy.indexOf("pressure_mm") > 0)
-    {
-        str_copy = str_copy.substring(str_copy.indexOf("pressure_mm")+13);
-        if (str_copy.indexOf(',') > 0)
-        {
-            str_copy = str_copy.substring(0,str_copy.indexOf(','));
-            pressure = str_copy;
-            str_copy = "";
-            founded = true;
-        } 
-    } 
+      founded = false;
+      str_copy = str;
+      str_copy = str_copy.substring(str_copy.indexOf("temp")+6);
+      
+      if (str_copy.indexOf('\"') > 0)
+      {
+          str_copy = str_copy.substring(0,str_copy.indexOf(','));
+          float temp;
+          sscanf(str_copy.c_str(), "%f", &temp);
+          int t = (int)temp;
+          temperature = (String)t;          
+          str_copy = "";
+          founded = true;
+      }
   }
-  if (str.indexOf("fact") > 0)
-  {
-    founded = false;
-    str_copy = str;
-    str_copy = str_copy.substring(str_copy.indexOf("fact"));
 
-    if (str_copy.indexOf("humidity") > 0)
-    { 
-        str_copy = str_copy.substring(str_copy.indexOf("humidity")+10);
-        if (str_copy.indexOf(',') > 0)
-        {
-            str_copy = str_copy.substring(0,str_copy.indexOf(','));
-            humidity = str_copy;
-            str_copy = "";
-            founded = true;
-        } 
-    } 
+  if (str.indexOf("pressure") > 0)
+  {
+      founded = false;
+      str_copy = str;
+      str_copy = str_copy.substring(str_copy.indexOf("pressure")+10);
+      
+      if ((int)str_copy.indexOf('\"') > 0)
+      {
+          str_copy = str_copy.substring(0,str_copy.indexOf(','));
+          int press = atoi(str_copy.c_str());
+          press = press*0.75;
+          pressure = (String)press;
+          str_copy = "";
+          founded = true;
+      }
+  }
+
+  if (str.indexOf("humidity") > 0)
+  {
+      founded = false;
+      str_copy = str;
+      str_copy = str_copy.substring(str_copy.indexOf("humidity")+10);
+      
+      if (str_copy.indexOf('}') > 0)
+      {
+          str_copy = str_copy.substring(0,str_copy.indexOf('}'));
+          humidity = str_copy;
+          str_copy = "";
+          founded = true;
+      }
+  }
+
+  if (str.indexOf("dt") > 0)
+  {
+      founded = false;
+      str_copy = str;
+      str_copy = str_copy.substring(str_copy.indexOf("dt")+4);
+      
+      if (str_copy.indexOf(',') > 0)
+      {
+          str_copy = str_copy.substring(0,str_copy.indexOf(','));
+          uptime = str_copy;
+          
+          str_copy = "";
+          founded = true;
+      }
+  }
+
+  if (str.indexOf("name") > 0)
+  {
+      founded = false;
+      str_copy = str;
+      str_copy = str_copy.substring(str_copy.indexOf("name")+7);
+      
+      if (str_copy.indexOf('\"') > 0)
+      {
+          str_copy = str_copy.substring(0,str_copy.indexOf('\"'));
+          city = str_copy;
+          
+          str_copy = "";
+          founded = true;
+      }
   }
 
   http.end();

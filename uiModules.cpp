@@ -11,6 +11,9 @@ lv_obj_t *labelTime;
 // Version info
 lv_obj_t *labelVersion;
 
+// Battery state
+lv_obj_t *labelVoltage;
+
 // WiFi info
 lv_obj_t *iconWifi;
 
