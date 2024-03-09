@@ -14,7 +14,9 @@
 #include "listOfStations.h"
 #include "sysTime.h"
 #include "weather.h"
+#include "RadioMetadata.h"
 #include "batteryStatus.h"
+
 
 
 #define TIMEOUT_WIFI_CONNECT     10
@@ -61,6 +63,9 @@ extern bool listDisplay;
 class listOfStations;
 extern listOfStations *listStations;
 extern int currentStation;
+
+class RadioMetadata;
+extern RadioMetadata *rdMetadata;
 
 // Create Audio objects
 extern bool audioPlaying;

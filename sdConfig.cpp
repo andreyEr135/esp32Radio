@@ -22,7 +22,7 @@ bool sdConfig::initSD()
 bool sdConfig::readConfig()
 {
   if (!sdInited) return false;
-  DynamicJsonDocument config(2500);
+  DynamicJsonDocument config(4000);
   File dataFile = SD.open(configFile.c_str());
   DeserializationError error = deserializeJson(config, dataFile);
 
@@ -61,7 +61,9 @@ bool sdConfig::readConfig()
     
     const char* _name = config["stations"][stationStr]["name"];
     const char* _path = config["stations"][stationStr]["path"];
-    listStations->addNewStation((String)_name, (String)_path);
+    const char* _meta = config["stations"][stationStr]["meta"];
+
+    listStations->addNewStation((String)_name, (String)_path, (String)_meta);
   }     
   return true;
 }

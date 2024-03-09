@@ -13,9 +13,10 @@ class listOfStations
   public:
     listOfStations();
     int getCountOfStations();
-    bool addNewStation(String name, String url);
+    bool addNewStation(String name, String url, String metadata = "");
     String getUrlOfStation(String name);
     String getNameOfStations(int id);
+    String getMetadataName(int id);
     int getIdOfStation(String name);
 
     
@@ -25,6 +26,7 @@ class listOfStations
     struct _stationInfo {
       String name;
       String url;
+      String metadata;
     };
     struct _stationInfo stationsInfo[MAX_STATIONS];
 

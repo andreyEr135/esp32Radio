@@ -18,6 +18,8 @@ int currentStation = 0;
 // _stationInfo stationInfo;
 // struct _stationInfo stationsInfo[MAX_STATIONS];
 
+RadioMetadata *rdMetadata;
+
 // Create Audio objects
 bool audioPlaying;
 Audio audio;

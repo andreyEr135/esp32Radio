@@ -55,16 +55,20 @@ static lv_color_t buf[screenWidth * 10];
 
 int tickWeather = 0;
 int tickBattery = 0;
+int tickGetMeta = 0;
 
 //every 1 sec
 void tickTimer(lv_timer_t * timer)
 {
+  // Hide volume page after 10s
   if ((volDisplay) && (tickVolume > TIMEOUT_VOLUME_PAGE))
   {
     HideVolume();
     tickVolume = 0;
     return;
   }
+
+  // Hide list page after 10s
   if ((listDisplay) && (tickStationList > TIMEOUT_STATIONLIST_PAGE))
   {
     HideMenuOfStations();
@@ -72,6 +76,7 @@ void tickTimer(lv_timer_t * timer)
     tickStationList = 0;    
     return;
   }
+
   if (volDisplay) tickVolume++;
   if (listDisplay) tickStationList++;
 
@@ -96,11 +101,19 @@ void tickTimer(lv_timer_t * timer)
   if (tickBattery > 5)
   {
     writeVoltage();
+    
+    String metaStation = listStations->getMetadataName(currentStation);
+    if (metaStation == "") writeTitle("");
+    else {
+      writeTitle(rdMetadata->getMetadata(metaStation).c_str());
+    }  
     tickBattery = 0;
   }
+
   tickWeather++;
   tickWeatherInfo++;
   tickBattery++;
+  tickGetMeta++;
 }
 
 
@@ -233,13 +246,12 @@ void setup() {
       audio_showstation("Radio Stations not found!");
     }
     sTime->syncTime();
-    
-    //if (!labelStationName) return;
-    //lv_label_set_text_fmt(labelStationName, "%s", weatherService->getErrStr().c_str());    
   }
 
+  rdMetadata = new RadioMetadata();
+
   tickWeatherInfo = 0;
-  dispTimer = lv_timer_create(tickTimer, 5,  NULL);
+  dispTimer = lv_timer_create(tickTimer, 1000,  NULL);
 
   xTaskCreatePinnedToCore(Task_Audio, "Task_Audio", 10240, NULL, 3, NULL, 0);
   delay(500); 
@@ -251,7 +263,7 @@ void Task_Audio(void *pvParameters) // This is a task.
 {
   while (true)
   {
-    audio.loop();
+    if (audioPlaying) audio.loop();
     delay(1);
   }
 }
@@ -262,10 +274,19 @@ void loop() {
   lv_timer_handler();  
 }
 
+//void audio_info(const char *info){
+//  writeTitle(info);
+//    Serial.print("audio_info: "); Serial.println(info);
+//}
+
+//void audio_id3data(const char *info){  //id3 metadata
+//     writeTitle(info);
+//}
+
 void audio_showstation(const char *info){
     writeStationName(info);
 }
 
 void audio_showstreamtitle(const char *info){
-    writeTitle(info);
+ // writeTitle(info);
 }

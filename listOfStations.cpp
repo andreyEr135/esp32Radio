@@ -10,11 +10,12 @@ int listOfStations::getCountOfStations()
   return countOfStations;
 }
     
-bool listOfStations::addNewStation(String name, String url)
+bool listOfStations::addNewStation(String name, String url, String metadata)
 {
   _stationInfo station;
   station.name = name;
   station.url = url;
+  station.metadata = metadata;
   stationsInfo[countOfStations] = station;
   countOfStations++;
   return true;
@@ -38,4 +39,10 @@ int listOfStations::getIdOfStation(String name)
   for (int i = 0; i < countOfStations; i++)
     if (strcmp(stationsInfo[i].name.c_str(), name.c_str()) == 0) return i;
   return -1;
+}
+
+String listOfStations::getMetadataName(int id)
+{
+  if (id > countOfStations) return "";
+  return stationsInfo[id].metadata;
 }
