@@ -21,6 +21,7 @@ String sysTime::getTime()
   if(!getLocalTime(&timeinfo)) {
     return "--:--";
   }
+  timeinfo.tm_hour = timeinfo.tm_hour - (gmtOffset_sec/3600);
   sprintf(str, "%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
   res = (String)str;
   return res;

@@ -10,10 +10,11 @@ class batteryStatus
 {
   public:
     batteryStatus();
-    String getBatteryVoltage();
+    int getBatteryCharge();
 
     
   private:
+    float getBatteryVoltage();
     int analog_pin;
     float adc_voltage;            // Создаем переменную adc_voltage
     float in_voltage;             // Создаем переменную in_voltage

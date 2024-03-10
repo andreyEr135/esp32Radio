@@ -10,7 +10,7 @@ void showTempLabel()
   if (weatherService) lv_label_set_text_fmt(labelTemp, "%s°C", weatherService->getTemperature().c_str());
   else lv_label_set_text_fmt(labelTemp, "---°C");
   
-  if (mainWin) lv_obj_set_pos(labelTemp, 400, 1);
+  if (mainWin) lv_obj_set_pos(labelTemp, 380, 1);
   else lv_obj_set_pos(labelTemp, 314, 155);
   //lv_obj_set_size(labelTemp, 88, 47);
   lv_color_t colour;
@@ -33,7 +33,7 @@ void reShowTempLabel()
     String temp = weatherService->getTemperature();
     lv_label_set_text_fmt(labelTemp, "%s°C", temp.c_str());
   } else lv_label_set_text_fmt(labelTemp, "---°C");
-  if (mainWin) lv_obj_set_pos(labelTemp, 400, 1);
+  if (mainWin) lv_obj_set_pos(labelTemp, 380, 1);
   else lv_obj_set_pos(labelTemp, 314, 155);
   //lv_obj_set_size(labelTemp, 88, 47);
   lv_color_t colour;

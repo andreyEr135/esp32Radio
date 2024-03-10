@@ -14,7 +14,7 @@ void wifiInfoDraw()
   {
     lv_img_set_src(iconWifi, &wifiNoIcon);
   }
-  lv_obj_set_pos(iconWifi, 452, 3);  
+  lv_obj_set_pos(iconWifi, 423, 3);  
 }
 
 void wifiInfoReDraw()

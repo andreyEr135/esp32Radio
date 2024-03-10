@@ -42,7 +42,7 @@
 #include "uiPressureLabel.h"
 #include "uiHumInfo.h"
 
-#include "uiVoltageLabel.h"
+#include "uiBatteryIcon.h"
 
 
 
@@ -98,16 +98,21 @@ void tickTimer(lv_timer_t * timer)
     if (!mainWin) reShowWeatherPage();
   }
 
-  if (tickBattery > 5)
+  if (tickBattery > 30)
   {
-    writeVoltage();
-    
+    batteryStatusRedraw();
+    tickBattery = 0;
+  }
+
+  if (tickGetMeta == 5)
+  {
     String metaStation = listStations->getMetadataName(currentStation);
     if (metaStation == "") writeTitle("");
     else {
       writeTitle(rdMetadata->getMetadata(metaStation).c_str());
     }  
-    tickBattery = 0;
+    tickGetMeta = 0;
+
   }
 
   tickWeather++;

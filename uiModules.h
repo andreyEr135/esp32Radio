@@ -22,7 +22,8 @@ extern lv_obj_t *labelTime;
 extern lv_obj_t *labelVersion;
 
 // Battery state
-extern lv_obj_t *labelVoltage;
+//extern lv_obj_t *labelVoltage;
+extern lv_obj_t *iconBattery;
 
 // WiFi info
 extern lv_obj_t *iconWifi;

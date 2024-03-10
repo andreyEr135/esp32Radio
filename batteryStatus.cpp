@@ -18,9 +18,9 @@ batteryStatus::batteryStatus()
 }
 
 
-String batteryStatus::getBatteryVoltage()
+float batteryStatus::getBatteryVoltage()
 {
-  String res;
+  float res = 0;
   adc_value = 0;
   for (int i = 0; i < 100; i++)
   {
@@ -31,11 +31,22 @@ String batteryStatus::getBatteryVoltage()
   
   adc_voltage = (adc_value * ref_voltage) / 4096.0; // Определение на входе АЦП
   
-  in_voltage = adc_voltage / (R2/(R1+R2)) + 0.2 ;         // Расчет напряжения
+  in_voltage = adc_voltage / (R2/(R1+R2)) + 0.2 + 0.3 ;         // Расчет напряжения
 
-  char str[10];
-  sprintf(str, "%.2f", in_voltage);
-  res = (String)str;
+  res = in_voltage;
+  //char str[10];
+  //sprintf(str, "%.2f", in_voltage);
+  //res = (String)str;
   
   return res;
+}
+
+int batteryStatus::getBatteryCharge()
+{
+  int res = 0;
+  float volt = getBatteryVoltage();
+  if (volt < 9) return 0;
+  //volt = volt - 9;
+  res = (volt-9)*100/(12.6-9);
+  return res;   
 }
