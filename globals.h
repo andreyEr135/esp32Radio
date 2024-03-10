@@ -18,6 +18,7 @@
 #include "batteryStatus.h"
 
 
+#define VERSION_STR "v3.0"
 
 #define TIMEOUT_WIFI_CONNECT     10
 #define TIMEOUT_VOLUME_PAGE      10

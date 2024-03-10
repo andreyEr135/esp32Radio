@@ -12,7 +12,7 @@ void showVersionStr()
   lv_style_set_text_color(&stVersionLabelStyle, colour);
 
   labelVersion = lv_label_create(lv_scr_act());
-  lv_label_set_text_fmt(labelVersion, "v2.0");
+  lv_label_set_text_fmt(labelVersion, VERSION_STR);
   lv_obj_set_pos(labelVersion, 215, 1);
   
   lv_obj_add_style(labelVersion, &stVersionLabelStyle, LV_PART_MAIN);
