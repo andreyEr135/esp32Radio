@@ -1,6 +1,8 @@
 #include "uiNextBtn.h"
 #include "uiStationName.h"
+#include "uiTitleLabel.h"
 #include "uiCurrentStationIcon.h"
+
 
 
 
@@ -15,6 +17,12 @@ static void eventNextStationBtn(lv_event_t * e)
       reshowCurrentRadioStationIcon();      
       audio.connecttohost(listStations->getUrlOfStation(listStations->getNameOfStations(currentStation)).c_str());
       readConfig->writeCurrentStation(currentStation);
+
+      String metaStation = listStations->getMetadataName(currentStation);
+      if (metaStation == "") writeTitle("");
+      else {
+        writeTitle(rdMetadata->getMetadata(metaStation).c_str());
+      }  
     }
 }
 

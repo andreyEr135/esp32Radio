@@ -1,6 +1,7 @@
 #include "uiMenuPage.h"
 #include "uiCurrentStationIcon.h"
 #include "uiStationName.h"
+#include "uiTitleLabel.h"
 #include "uiMenuBtn.h"
 
 
@@ -16,6 +17,12 @@ static void eventListClickedHandler(lv_event_t * e)
     audio.connecttohost(listStations->getUrlOfStation((String)lv_list_get_btn_text(menuOfStations, btn)).c_str());   
     HideMenuOfStations();
     readConfig->writeCurrentStation(currentStation);
+
+    String metaStation = listStations->getMetadataName(currentStation);
+    if (metaStation == "") writeTitle("");
+    else {
+      writeTitle(rdMetadata->getMetadata(metaStation).c_str());
+    }  
   }
 }
 
