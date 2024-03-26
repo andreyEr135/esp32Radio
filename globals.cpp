@@ -38,6 +38,9 @@ weather *weatherService;
 // Battery status
 batteryStatus *battery;
 
+// WebServer
+//ESP32WebServer *server;
+
 // LGFX
 LGFX tft;
 

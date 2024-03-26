@@ -76,6 +76,11 @@ lv_obj_t *labelPressure;
 lv_obj_t *iconHum;
 lv_obj_t *labelHum;
 
+//AP info
+lv_obj_t *labelApName;
+lv_obj_t *labelApPswd;
+lv_obj_t *labelApIp;
+
 // Timer
 TaskHandle_t timerDispTask;
 lv_timer_t *dispTimer;

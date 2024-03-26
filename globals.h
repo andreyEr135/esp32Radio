@@ -17,8 +17,12 @@
 #include "RadioMetadata.h"
 #include "batteryStatus.h"
 
+//#include "webConfig.h"
 
-#define VERSION_STR "v3.0"
+//#include <ESP32WebServer.h>
+
+
+#define VERSION_STR "v4.0"
 
 #define TIMEOUT_WIFI_CONNECT     10
 #define TIMEOUT_VOLUME_PAGE      10
@@ -88,6 +92,8 @@ extern weather *weatherService;
 // Battery status
 class batteryStatus;
 extern batteryStatus *battery;
+
+
 
 
 

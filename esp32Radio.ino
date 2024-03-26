@@ -43,15 +43,19 @@
 #include "uiHumInfo.h"
 
 #include "uiBatteryIcon.h"
+#include "webConfig.h"
 
-
-
-
+#include "uiApPage.h"
+#include "uiApTitle.h"
+#include "uiApName.h"
+#include "uiApPswd.h"
+#include "uiApIp.h"
 
 
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t buf[screenWidth * 10];
 
+bool serverMode = false;
 
 int tickWeather = 0;
 int tickBattery = 0;
@@ -82,20 +86,26 @@ void tickTimer(lv_timer_t * timer)
 
   playPauseBtnChangeState(audio.isRunning());
   wifiInfoReDraw();
-  reshowTimeStr();
+  if (!serverMode) reshowTimeStr();
 
-  if (tickWeatherInfo == TIMEOUT_WEATHER_INFO) 
+  if (!serverMode)
   {
-    if (mainWin) showWeatherPage();
-    tickWeatherInfo = 0;
+    if (tickWeatherInfo == TIMEOUT_WEATHER_INFO) 
+    {
+      if (mainWin) showWeatherPage();
+      tickWeatherInfo = 0;
+    }
   }
 
-  if (tickWeather > TIMEOUT_WEATHER_GET+1) tickWeather = 0;
-  if (tickWeather == 0)
+  if (!serverMode)
   {
-    weatherService->getWeather();
-    writeTemp();
-    if (!mainWin) reShowWeatherPage();
+    if (tickWeather > TIMEOUT_WEATHER_GET+1) tickWeather = 0;
+    if (tickWeather == 0)
+    {
+      weatherService->getWeather();
+      writeTemp();
+      if (!mainWin) reShowWeatherPage();
+    }
   }
 
   if (tickBattery > 30)
@@ -104,21 +114,26 @@ void tickTimer(lv_timer_t * timer)
     tickBattery = 0;
   }
 
-  if (tickGetMeta == 5)
+  if (!serverMode)
   {
-    String metaStation = listStations->getMetadataName(currentStation);
-    if (metaStation == "") writeTitle("");
-    else {
-      writeTitle(rdMetadata->getMetadata(metaStation).c_str());
-    }  
-    tickGetMeta = 0;
-
+    if (tickGetMeta == 5)
+    {
+      String metaStation = listStations->getMetadataName(currentStation);
+      if (metaStation == "") writeTitle("");
+      else {
+        writeTitle(rdMetadata->getMetadata(metaStation).c_str());
+      }  
+      tickGetMeta = 0;
+    }
   }
 
-  tickWeather++;
-  tickWeatherInfo++;
+  if (!serverMode)
+  {
+    tickWeather++;
+    tickWeatherInfo++;
+    tickGetMeta++;
+  }
   tickBattery++;
-  tickGetMeta++;
 }
 
 
@@ -150,7 +165,8 @@ void CreateControls(void)
 
   showBackground();
 
-  showMainPage();
+  if (!serverMode) showMainPage();
+  else showApPage();
   
 
 }
@@ -211,59 +227,6 @@ bool wifiSetup()
   return true;
 }
 
-void setup() {
-  audioPlaying = false;
-  readConfig = new sdConfig();
-  listStations = new listOfStations();
-  sTime = new sysTime(TIME_OFFSET);
-
-  battery = new batteryStatus();
-  
- 
-  displaySetup();  
-
-  volumeOut = readConfig->readOldVolume();
-  audioSetup();
-
-  CreateControls();
-
-  if (!readConfig->readConfig())
-  {
-    audio_showstation("Read config from SD card error");
-    audio_showstreamtitle(readConfig->GetError().c_str());
-    return;
-  }
-
-  
-
-  weatherService = new weather(readConfig->getWeatherLat(), readConfig->getWeatherLon(), readConfig->getWeatherToken());
-  
-  if (wifiSetup())  
-  {
-
-    if (listStations->getCountOfStations() > 0)
-    {
-      currentStation = readConfig->readOldStation();
-      reshowCurrentRadioStationIcon();
-      audio.connecttohost(listStations->getUrlOfStation(listStations->getNameOfStations(currentStation)).c_str());
-    }  else
-    {
-      audio_showstation("Radio Stations not found!");
-    }
-    sTime->syncTime();
-  }
-
-  rdMetadata = new RadioMetadata();
-
-  tickWeatherInfo = 0;
-  dispTimer = lv_timer_create(tickTimer, 1000,  NULL);
-
-  xTaskCreatePinnedToCore(Task_Audio, "Task_Audio", 10240, NULL, 3, NULL, 0);
-  delay(500); 
-
-  playPauseBtnChangeState(audio.isRunning());
-}
-
 void Task_Audio(void *pvParameters) // This is a task.
 {
   while (true)
@@ -272,11 +235,83 @@ void Task_Audio(void *pvParameters) // This is a task.
     delay(1);
   }
 }
+
+void setup() {
+  audioPlaying = false;
+  displaySetup();
+
+  pinMode(14, INPUT);
+  for (int i = 0; i < 10; i++)
+  {
+    serverMode = digitalRead(14);   
+    delay(5);
+  }    
+
+  if (!serverMode)
+  {
+    readConfig = new sdConfig();
+    listStations = new listOfStations();
+    sTime = new sysTime(TIME_OFFSET);
+    battery = new batteryStatus();
+
+    volumeOut = readConfig->readOldVolume();
+    audioSetup();
+
+    CreateControls();
+
+
+    if (!readConfig->readConfig())
+    {
+      audio_showstation("Read config from SD card error");
+      audio_showstreamtitle(readConfig->GetError().c_str());
+      return;
+    }
+
+    weatherService = new weather(readConfig->getWeatherLat(), readConfig->getWeatherLon(), readConfig->getWeatherToken());
+  
+  
+    if (wifiSetup())  
+    {
+
+      if (listStations->getCountOfStations() > 0)
+      {
+        currentStation = readConfig->readOldStation();
+        reshowCurrentRadioStationIcon();
+        if (!serverMode) audio.connecttohost(listStations->getUrlOfStation(listStations->getNameOfStations(currentStation)).c_str());
+      }  else
+      {
+        audio_showstation("Radio Stations not found!");
+      }
+      sTime->syncTime();
+    }
+  
+
+    rdMetadata = new RadioMetadata();
+
+    tickWeatherInfo = 0;
+    dispTimer = lv_timer_create(tickTimer, 1000,  NULL);
+
+    xTaskCreatePinnedToCore(Task_Audio, "Task_Audio", 10240, NULL, 3, NULL, 0);
+    delay(500); 
+
+    playPauseBtnChangeState(audio.isRunning());
+  }
+  else {
+    readConfig = new sdConfig();
+    CreateControls();
+    serverStart();
+
+  }
+  
+}
+
+
   
 
 
 void loop() {
   lv_timer_handler();  
+  if (serverMode) server->handleClient();
 }
 
 //void audio_info(const char *info){

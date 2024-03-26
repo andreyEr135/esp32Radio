@@ -88,6 +88,11 @@ extern lv_obj_t *labelPressure;
 extern lv_obj_t *iconHum;
 extern lv_obj_t *labelHum;
 
+//AP info
+extern lv_obj_t *labelApName;
+extern lv_obj_t *labelApPswd;
+extern lv_obj_t *labelApIp;
+
 // Timer
 extern TaskHandle_t timerDispTask;
 extern lv_timer_t *dispTimer;

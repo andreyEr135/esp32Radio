@@ -32,6 +32,15 @@ class sdConfig
     bool writeCurrentVolume(int vol);
     int  readOldVolume();
 
+    String getListOfFiles();
+    File getFile(String path);
+
+    bool openFileForWrite(String name);
+    bool writeToFile(uint8_t *buf, int size);
+    bool closeFile();
+    bool removeFile(String name);
+    bool isFileOpened();
+
   private:
     bool initSD();
     String configFile;
@@ -42,6 +51,9 @@ class sdConfig
     String weatherToken;
     float weatherLat;
     float weatherLon;
+
+    File fl;
+    bool fileOpened;
   
 };
 

@@ -4,6 +4,7 @@ sdConfig::sdConfig()
 {
   configFile = "/config.json";
   sdInited = initSD();
+  fileOpened = false;
 }
 
 bool sdConfig::initSD()
@@ -202,4 +203,84 @@ int sdConfig::readOldVolume()
   // close the file:
   volumeFile.close();
   return res;
+}
+
+String sdConfig::getListOfFiles()
+{
+  String res = "";
+  File root = SD.open("/");
+  root.rewindDirectory();
+  while(true) {
+    File entry =  root.openNextFile();
+    if (! entry) {
+      // no more files
+      break;
+    }
+    res += String("<tr><td>")+String(entry.name())+"</td>";
+    int bytes = entry.size();
+    String fsize = "";
+    if (bytes < 1024)                     fsize = String(bytes)+" B";
+    else if(bytes < (1024 * 1024))        fsize = String(bytes/1024.0,3)+" KB";
+    else if(bytes < (1024 * 1024 * 1024)) fsize = String(bytes/1024.0/1024.0,3)+" MB";
+    else                                  fsize = String(bytes/1024.0/1024.0/1024.0,3)+" GB";
+    res += "<td>"+fsize+"</td>";
+    res += "<td>";
+    res += F("<FORM action='/' method='post'>"); 
+    res += F("<button type='submit' name='download'"); 
+    res += F("' value='"); res +="download_"+String(entry.name()); res +=F("'>Скачать</button>");
+    res += "</td>";
+    res += "<td>";
+    res += F("<FORM action='/' method='post'>"); 
+    res += F("<button type='submit' name='delete'"); 
+    res += F("' value='"); res +="delete_"+String(entry.name()); res +=F("'>Удалить</button>");
+    res += "</td>";
+    res += "</tr>";
+    //String("<a href='") + String(entry.name()) + String("'>") + String(entry.name()) + String("</a>") + String("</br>");
+    entry.close();
+  }
+  return res;
+}
+
+File sdConfig::getFile(String path)
+{
+  return SD.open(path.c_str());
+}
+
+
+bool sdConfig::openFileForWrite(String name)
+{
+  fl = SD.open(name.c_str(), FILE_WRITE);
+  if(!fl){
+    audio_showstation("- failed to open file for writing");
+    return false;
+  }
+  fileOpened = true;  
+  return true;
+}
+
+bool sdConfig::writeToFile(uint8_t *buf, int size)
+{
+  if(fl.write(buf, size) != size){
+    audio_showstation("- failed to write");
+    return false;
+  }
+  return true;
+}
+
+bool sdConfig::closeFile()
+{
+  fl.close();
+  fileOpened = false;  
+  return true;
+}
+
+bool sdConfig::removeFile(String name)
+{
+  SD.remove(name);
+  return true;
+}
+
+bool sdConfig::isFileOpened()
+{
+  return fileOpened;
 }
