@@ -13,6 +13,8 @@
 #include <QJsonParseError>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QTimer>
+#include <QProcess>
 
 #include "mapform.h"
 
@@ -44,6 +46,7 @@ private slots:
 
     void on_openMap_clicked();
     void onUpdatePos(double _lat, double _lon);
+    void onTimerTout();
 
 private:
     Ui::WiFiRadioConfig *ui;
@@ -54,5 +57,6 @@ private:
     void clearListStations();
     void addStation(int id, QString name, QString path, QString meta_path);
     MapForm *mapF;
+    QTimer *timer;
 };
 #endif // WIFIRADIOCONFIG_H

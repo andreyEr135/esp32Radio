@@ -12,6 +12,7 @@ TARGET = WiFiRadioConfig
 TEMPLATE = app
 
 SOURCES += \
+    dynamicImageButton.cpp \
     dynamicbutton.cpp \
     main.cpp \
     mapform.cpp \
@@ -19,6 +20,7 @@ SOURCES += \
     wifiradioconfig.cpp
 
 HEADERS += \
+    dynamicImageButton.h \
     dynamicbutton.h \
     mapform.h \
     radioinfo.h \
@@ -47,3 +49,6 @@ DEPENDPATH += $$PWD/../MapGraphics
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 #!isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    images.qrc

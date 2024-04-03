@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <dynamicbutton.h>
+#include <dynamicImageButton.h>
 
 class radioInfo : public QFrame
 {
@@ -17,9 +18,10 @@ public:
     QLineEdit *addressStation;
     QLineEdit *addressMetaStation;
 
-    dynamicButton *upBtn;
-    dynamicButton *downBtn;
-    dynamicButton *delBtn;
+    dynamicImageButton *upBtn;
+    dynamicImageButton *downBtn;
+    //dynamicButton *delBtn;
+    dynamicImageButton *delBtn;
 
     int GetId()
     {

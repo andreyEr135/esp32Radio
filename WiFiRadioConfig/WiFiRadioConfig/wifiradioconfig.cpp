@@ -28,11 +28,11 @@ WiFiRadioConfig::WiFiRadioConfig(QWidget *parent)
 
     ui->ipAddress->setAlignment(Qt::AlignVCenter);
 
-    //QWidget *w = new QWidget(this);
-    //QLabel *lbl = new QLabel(w);
-    //lbl->setText("dfdfdfDf");
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(onTimerTout()));
 
-    //vList->addWidget(w);
+    QPixmap pStat(":/images/statusDisconnect.svg");
+    ui->status->setPixmap(pStat);
 
     manager = new QNetworkAccessManager(this);
     QObject::connect(manager, &QNetworkAccessManager::finished,
@@ -49,7 +49,10 @@ WiFiRadioConfig::WiFiRadioConfig(QWidget *parent)
                 QString answer = reply->readAll();
                 ReadJson(answer);
                 ui->connect->setText("Подключено");
+                QPixmap pStat(":/images/statusConnect.svg");
+                ui->status->setPixmap(pStat);
                 ui->loadConfig->setEnabled(true);
+                timer->start(10000);
             } else
             {
                 //qDebug() << reply->readAll();
@@ -412,6 +415,34 @@ void WiFiRadioConfig::on_openMap_clicked()
     connect(mapF, SIGNAL(updatePos(double, double)), this, SLOT(onUpdatePos(double, double)));
     mapF->show();
 
+
+}
+
+void WiFiRadioConfig::onTimerTout()
+{
+    QStringList parameters;
+   #if defined(WIN32)
+      parameters << "-n" << "1";
+   #else
+      parameters << "-c 1";
+   #endif
+
+      parameters << ui->ipAddress->text();
+
+      int exitCode = QProcess::execute("ping", parameters);
+      if (exitCode==0) {
+          // it's alive
+          qDebug() << "ping ok";
+          ui->connect->setText("Подключено");
+          ui->loadConfig->setEnabled(true);
+      } else {
+          qDebug() << "ping error!";
+          ui->connect->setText("Подключиться");
+          ui->loadConfig->setEnabled(false);
+          QPixmap pStat(":/images/statusDisconnect.svg");
+          ui->status->setPixmap(pStat);
+          timer->stop();
+      }
 
 }
 

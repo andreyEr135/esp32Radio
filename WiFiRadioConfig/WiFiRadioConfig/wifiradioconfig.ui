@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1089</width>
+    <width>1319</width>
     <height>1096</height>
    </rect>
   </property>
@@ -85,6 +85,25 @@
            <font>
             <pointsize>16</pointsize>
            </font>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="status">
+          <property name="minimumSize">
+           <size>
+            <width>10</width>
+            <height>10</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>10</width>
+            <height>10</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
           </property>
          </widget>
         </item>
