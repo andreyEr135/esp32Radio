@@ -24,6 +24,8 @@ WiFiRadioConfig::WiFiRadioConfig(QWidget *parent)
     ui->radioList->setWidget(wList);
     ui->loadConfig->setEnabled(false);
 
+    ui->passwdWiFi->setEchoMode(QLineEdit::Password);
+
     countStations = 0;
 
     ui->ipAddress->setAlignment(Qt::AlignVCenter);
@@ -158,6 +160,7 @@ void WiFiRadioConfig::on_addStation_clicked()
 
     vList->addWidget(radioSetup);
 
+    vList->addSpacing(500);
 
 }
 
@@ -431,12 +434,9 @@ void WiFiRadioConfig::onTimerTout()
 
       int exitCode = QProcess::execute("ping", parameters);
       if (exitCode==0) {
-          // it's alive
-          qDebug() << "ping ok";
           ui->connect->setText("Подключено");
           ui->loadConfig->setEnabled(true);
       } else {
-          qDebug() << "ping error!";
           ui->connect->setText("Подключиться");
           ui->loadConfig->setEnabled(false);
           QPixmap pStat(":/images/statusDisconnect.svg");

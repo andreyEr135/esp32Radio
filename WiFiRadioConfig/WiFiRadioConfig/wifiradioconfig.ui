@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1319</width>
+    <width>1094</width>
     <height>1096</height>
    </rect>
   </property>
@@ -75,16 +75,28 @@
         </item>
         <item>
          <widget class="QLineEdit" name="ipAddress">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>41</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>300</width>
-            <height>50</height>
+            <height>41</height>
            </size>
           </property>
           <property name="font">
            <font>
             <pointsize>16</pointsize>
            </font>
+          </property>
+          <property name="inputMask">
+           <string>000.000.000.000</string>
+          </property>
+          <property name="text">
+           <string>192.168.123.123</string>
           </property>
          </widget>
         </item>
@@ -564,10 +576,16 @@
         </item>
         <item>
          <widget class="QLineEdit" name="configFile">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>41</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>500</width>
-            <height>50</height>
+            <height>41</height>
            </size>
           </property>
           <property name="font">
