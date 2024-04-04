@@ -15,6 +15,13 @@ bool dynamicImageButton :: event(QEvent *myEvent)
 {
     switch(myEvent->type())
     {
+        case(QEvent :: MouseButtonPress):   // Identify Mouse press Event
+        {
+            emit dButtonPressed();
+            return true;
+            break;
+        }
+
         case(QEvent :: MouseButtonRelease):   // Identify Mouse press Event
         {
             emit dButtonClicked();

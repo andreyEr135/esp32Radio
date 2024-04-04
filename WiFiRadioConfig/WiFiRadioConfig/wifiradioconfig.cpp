@@ -2,7 +2,7 @@
 #include "ui_wifiradioconfig.h"
 
 #include "qerrormessage.h"
-//#include "dynamicbutton.h"
+#include "dynamicImageButton.h"
 
 #include "radioinfo.h"
 #include "qdebug.h"
@@ -18,6 +18,25 @@ WiFiRadioConfig::WiFiRadioConfig(QWidget *parent)
 {
     ui->setupUi(this);
     //QGridLayout *grL = new QGridLayout();
+
+    dynamicImageButton *openFile = new dynamicImageButton(this);
+    openFile->setFixedSize(49,35);
+    QPixmap pOpen(":/images/open.svg");
+    openFile->setPixmap(pOpen);
+    openFile->SetName("open");
+    connect(openFile, SIGNAL(dButtonClicked()), this, SLOT(onButtonsClicked()));
+    ui->horizontalLayout_7->addWidget(openFile);
+
+    dynamicImageButton *showPswd = new dynamicImageButton(this);
+    showPswd->setFixedSize(20,30);
+    QPixmap pShow(":/images/showPasswd.svg");
+    showPswd->setPixmap(pShow);
+    showPswd->SetName("showPasswd");
+
+    connect(showPswd, SIGNAL(dButtonPressed()), this, SLOT(onButtonPressed()));
+    connect(showPswd, SIGNAL(dButtonClicked()), this, SLOT(onButtonsClicked()));
+    ui->horizontalLayout_3->addWidget(showPswd);
+
     QWidget *wList = new QWidget(ui->radioList);
     vList = new QVBoxLayout(wList);
 
@@ -25,6 +44,7 @@ WiFiRadioConfig::WiFiRadioConfig(QWidget *parent)
     ui->loadConfig->setEnabled(false);
 
     ui->passwdWiFi->setEchoMode(QLineEdit::Password);
+    //ui->passwdWiFi->setInputMethodHints(Qt::ImhHiddenText| Qt::ImhNoPredictiveText|Qt::ImhNoAutoUppercase);
 
     countStations = 0;
 
@@ -160,7 +180,7 @@ void WiFiRadioConfig::on_addStation_clicked()
 
     vList->addWidget(radioSetup);
 
-    vList->addSpacing(500);
+    //vList->addSpacing(500);
 
 }
 
@@ -314,18 +334,10 @@ bool WiFiRadioConfig::SaveJson(QString fileName)
 
 void WiFiRadioConfig::on_openFile_clicked()
 {
-    QString strFilter="*.json";
-
-    QString str = QFileDialog::getOpenFileName(0,
-                                    "Открыть конфигурацию",
-                                    "",
-                                    "*.json",
-                                    &strFilter
-                                    );
+    QString str = ui->configFile->text();
 
     if (!str.isEmpty())
     {
-        ui->configFile->setText(str);
         QFile file;
         file.setFileName(str);
         file.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -445,4 +457,49 @@ void WiFiRadioConfig::onTimerTout()
       }
 
 }
+
+void WiFiRadioConfig::onButtonPressed()
+{
+    dynamicButton *button = (dynamicButton*) sender();
+    QString name = button->GetName();
+    if (name.contains("showPasswd"))
+    {
+        //if (ui->passwdWiFi->echoMode() == QLineEdit::Password)
+            ui->passwdWiFi->setEchoMode(QLineEdit::Normal);
+        //else
+        //    ui->passwdWiFi->setEchoMode(QLineEdit::Password);
+
+    }
+}
+
+void WiFiRadioConfig::onButtonsClicked()
+{
+    dynamicButton *button = (dynamicButton*) sender();
+    QString name = button->GetName();
+    if (name.contains("open"))
+    {
+        QString strFilter="*.json";
+
+        QString str = QFileDialog::getOpenFileName(0,
+                                        "Открыть конфигурацию",
+                                        "",
+                                        "*.json",
+                                        &strFilter
+                                        );
+
+        if (!str.isEmpty())
+        {
+            ui->configFile->setText(str);
+        }
+
+    } else if (name.contains("showPasswd"))
+    {
+        //if (ui->passwdWiFi->echoMode() == QLineEdit::Password)
+        //    ui->passwdWiFi->setEchoMode(QLineEdit::Normal);
+        //else
+            ui->passwdWiFi->setEchoMode(QLineEdit::Password);
+
+    }
+}
+
 

@@ -24,6 +24,7 @@ public:
     };
 
 signals:
+    void dButtonPressed();
     void dButtonClicked();       // Signal to emit
 
 protected:

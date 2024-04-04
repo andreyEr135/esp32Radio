@@ -5,5 +5,9 @@
         <file>images/up.svg</file>
         <file>images/statusConnect.svg</file>
         <file>images/statusDisconnect.svg</file>
+        <file>images/open.svg</file>
+        <file>images/showPasswd.svg</file>
+        <file>images/icon.svg</file>
+        <file>images/icon.ico</file>
     </qresource>
 </RCC>

@@ -6,7 +6,7 @@ radioInfo::radioInfo(QWidget *parent, int _id) :
     id = _id;
     setFrameShape(QFrame::Panel);
     setLineWidth(2);
-    setFixedSize(1030,191);
+    setFixedSize(1080,191);
     numStation = new QLabel(this);
     numStation->setGeometry(10,10, 41,21);
     numStation->setText(QString::number(id));
@@ -34,7 +34,7 @@ radioInfo::radioInfo(QWidget *parent, int _id) :
     addressMetaStation->setGeometry(250,130,670,50);
 
     upBtn = new dynamicImageButton(this);
-    upBtn->setGeometry(950, 10, 50, 50);
+    upBtn->setGeometry(1000, 10, 50, 50);
     QPixmap pUp(":/images/up.svg");
     upBtn->setPixmap(pUp);
     upBtn->SetName(QString("up_%1").arg(id));
@@ -43,14 +43,14 @@ radioInfo::radioInfo(QWidget *parent, int _id) :
     connect(upBtn, SIGNAL(dButtonClicked()), this, SLOT(onButtonsClicked()));
 
     delBtn = new dynamicImageButton(this);
-    delBtn->setGeometry(950, 70, 50, 50);
+    delBtn->setGeometry(1000, 70, 50, 50);
     QPixmap pDel(":/images/remove.svg");
     delBtn->setPixmap(pDel);
     delBtn->SetName(QString("remove_%1").arg(id));
     connect(delBtn, SIGNAL(dButtonClicked()), this, SLOT(onButtonsClicked()));
 
     downBtn = new dynamicImageButton(this);
-    downBtn->setGeometry(950, 130, 50, 50);
+    downBtn->setGeometry(1000, 130, 50, 50);
     QPixmap pDown(":/images/down.svg");
     downBtn->setPixmap(pDown);
     downBtn->SetName(QString("down_%1").arg(id));

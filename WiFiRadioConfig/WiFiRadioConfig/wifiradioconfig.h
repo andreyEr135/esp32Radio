@@ -15,6 +15,7 @@
 #include <QMessageBox>
 #include <QTimer>
 #include <QProcess>
+#include <QScrollArea>
 
 #include "mapform.h"
 
@@ -47,6 +48,8 @@ private slots:
     void on_openMap_clicked();
     void onUpdatePos(double _lat, double _lon);
     void onTimerTout();
+    void onButtonsClicked();
+    void onButtonPressed();
 
 private:
     Ui::WiFiRadioConfig *ui;
