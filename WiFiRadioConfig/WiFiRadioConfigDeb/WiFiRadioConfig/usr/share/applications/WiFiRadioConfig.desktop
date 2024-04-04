@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Конфигурация WiFi Radio
+Exec=WiFiRadioConfig
+Terminal=false
+StartupNotify=true
+Type=Application
+Icon=WiFIRadioConfig
+Categories=Mobile;
+MimeType=application/x-wifiradioconfig;

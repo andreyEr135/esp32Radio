@@ -1,0 +1,5 @@
+Package: WiFiRadioConfig
+Version: 1.0
+Provides: WiFiRadioConfig
+Architecture: all
+
