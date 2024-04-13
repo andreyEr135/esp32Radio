@@ -39,6 +39,10 @@ WiFiRadioConfig::WiFiRadioConfig(QWidget *parent)
 
     QWidget *wList = new QWidget(ui->radioList);
     vList = new QVBoxLayout(wList);
+    spacer = new QSpacerItem(0, 5,
+             QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
+    vList->addSpacerItem(spacer);
+    //vList->setDirection(QBoxLayout::TopToBottom);
 
     ui->radioList->setWidget(wList);
     ui->loadConfig->setEnabled(false);
@@ -141,6 +145,7 @@ void WiFiRadioConfig::onDownClicked(int id)
 }
 void WiFiRadioConfig::onRemoveClicked(int id)
 {
+    vList->removeItem(spacer);
     for(int i = 0; i < vList->count(); i++){
         radioInfo *info = qobject_cast<radioInfo*>(vList->itemAt(i)->widget());
         if(info->GetId() == id){
@@ -159,6 +164,7 @@ void WiFiRadioConfig::onRemoveClicked(int id)
             countStations--;
         }
     }
+    vList->addSpacerItem(spacer);
 }
 
 
@@ -178,9 +184,10 @@ void WiFiRadioConfig::on_addStation_clicked()
     connect(radioSetup, SIGNAL(down_signal(int)), this, SLOT(onDownClicked(int)));
     connect(radioSetup, SIGNAL(remove_signal(int)), this, SLOT(onRemoveClicked(int)));
 
+    vList->removeItem(spacer);
     vList->addWidget(radioSetup);
 
-    //vList->addSpacing(500);
+    vList->addSpacerItem(spacer);
 
 }
 
@@ -203,6 +210,7 @@ void WiFiRadioConfig::on_connect_clicked()
 
 void WiFiRadioConfig::clearListStations()
 {
+    vList->removeItem(spacer);
     while (vList->count() != 0)
     {
         radioInfo *info = qobject_cast<radioInfo*>(vList->itemAt(0)->widget());

@@ -16,6 +16,7 @@
 #include <QTimer>
 #include <QProcess>
 #include <QScrollArea>
+#include <QSpacerItem>
 
 #include "mapform.h"
 
@@ -50,7 +51,11 @@ private slots:
     void onTimerTout();
     void onButtonsClicked();
     void onButtonPressed();
+    //void onAddItem();
 
+
+//signals:
+  //  void addItem();
 private:
     Ui::WiFiRadioConfig *ui;
     QNetworkAccessManager *manager;
@@ -61,5 +66,6 @@ private:
     void addStation(int id, QString name, QString path, QString meta_path);
     MapForm *mapF;
     QTimer *timer;
+    QSpacerItem *spacer;
 };
 #endif // WIFIRADIOCONFIG_H
