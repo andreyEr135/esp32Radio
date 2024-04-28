@@ -17,19 +17,22 @@ SOURCES += \
     main.cpp \
     mapform.cpp \
     radioinfo.cpp \
-    wifiradioconfig.cpp
+    wifiradioconfig.cpp \
+    wifisearch.cpp
 
 HEADERS += \
     dynamicImageButton.h \
     dynamicbutton.h \
     mapform.h \
     radioinfo.h \
-    wifiradioconfig.h
+    wifiradioconfig.h \
+    wifisearch.h
 
 FORMS += \
     form.ui \
     mapform.ui \
-    wifiradioconfig.ui
+    wifiradioconfig.ui \
+    wifisearch.ui
 
 TRANSLATIONS += \
     WiFiRadioConfig_ru_RU.ts

@@ -19,6 +19,9 @@
 #include <QSpacerItem>
 
 #include "mapform.h"
+#include "wifisearch.h"
+
+class WiFiSearch;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class WiFiRadioConfig; }
@@ -51,6 +54,8 @@ private slots:
     void onTimerTout();
     void onButtonsClicked();
     void onButtonPressed();
+    void onWiFiSearchFormClose();
+    void onWiFiClicked(QString ssid);
     //void onAddItem();
 
 
@@ -67,5 +72,6 @@ private:
     MapForm *mapF;
     QTimer *timer;
     QSpacerItem *spacer;
+    WiFiSearch *searchNetworks;
 };
 #endif // WIFIRADIOCONFIG_H

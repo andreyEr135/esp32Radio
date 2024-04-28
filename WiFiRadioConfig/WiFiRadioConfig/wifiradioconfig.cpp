@@ -7,6 +7,7 @@
 #include "radioinfo.h"
 #include "qdebug.h"
 
+
 QVBoxLayout *vList;
 int countStations;
 
@@ -27,11 +28,23 @@ WiFiRadioConfig::WiFiRadioConfig(QWidget *parent)
     connect(openFile, SIGNAL(dButtonClicked()), this, SLOT(onButtonsClicked()));
     ui->horizontalLayout_7->addWidget(openFile);
 
+
+    dynamicImageButton *findWiFi = new dynamicImageButton(this);
+    findWiFi->setFixedSize(20,30);
+    QPixmap pFind(":/images/findWiFi.svg");
+    findWiFi->setPixmap(pFind);
+    findWiFi->SetName("findWiFi");
+    connect(findWiFi, SIGNAL(dButtonClicked()), this, SLOT(onButtonsClicked()));
+    ui->horizontalLayout_2->addWidget(findWiFi);
+
+
     dynamicImageButton *showPswd = new dynamicImageButton(this);
     showPswd->setFixedSize(20,30);
     QPixmap pShow(":/images/showPasswd.svg");
     showPswd->setPixmap(pShow);
     showPswd->SetName("showPasswd");
+
+
 
     connect(showPswd, SIGNAL(dButtonPressed()), this, SLOT(onButtonPressed()));
     connect(showPswd, SIGNAL(dButtonClicked()), this, SLOT(onButtonsClicked()));
@@ -371,7 +384,9 @@ void WiFiRadioConfig::on_saveConfig_clicked()
     if (!str.isEmpty())
     {
         qDebug() << str;
+        vList->removeItem(spacer);
         SaveJson(str);
+        vList->addItem(spacer);
     }
 
 }
@@ -380,7 +395,9 @@ void WiFiRadioConfig::on_saveConfig_clicked()
 void WiFiRadioConfig::on_loadConfig_clicked()
 {
     QString path = "/home/user/config_0.json";
+    vList->removeItem(spacer);
     SaveJson(path);
+    vList->addItem(spacer);
     getFile = false;
 
     QFile file(path); //lets get the file by filename
@@ -472,11 +489,7 @@ void WiFiRadioConfig::onButtonPressed()
     QString name = button->GetName();
     if (name.contains("showPasswd"))
     {
-        //if (ui->passwdWiFi->echoMode() == QLineEdit::Password)
-            ui->passwdWiFi->setEchoMode(QLineEdit::Normal);
-        //else
-        //    ui->passwdWiFi->setEchoMode(QLineEdit::Password);
-
+        ui->passwdWiFi->setEchoMode(QLineEdit::Normal);
     }
 }
 
@@ -502,12 +515,27 @@ void WiFiRadioConfig::onButtonsClicked()
 
     } else if (name.contains("showPasswd"))
     {
-        //if (ui->passwdWiFi->echoMode() == QLineEdit::Password)
-        //    ui->passwdWiFi->setEchoMode(QLineEdit::Normal);
-        //else
-            ui->passwdWiFi->setEchoMode(QLineEdit::Password);
+        ui->passwdWiFi->setEchoMode(QLineEdit::Password);
+    } else if (name.contains("findWiFi"))
+    {
+        searchNetworks = new WiFiSearch();
+        connect(searchNetworks, SIGNAL(closeForm()), this, SLOT(onWiFiSearchFormClose()));
+        connect(searchNetworks, SIGNAL(networkCLicked(QString)), this, SLOT(onWiFiClicked(QString)));
 
+        searchNetworks->show();
     }
 }
 
+void WiFiRadioConfig::onWiFiSearchFormClose()
+{
+    disconnect(searchNetworks, SIGNAL(closeForm()), this, SLOT(onWiFiSearchFormClose()));
+    disconnect(searchNetworks, SIGNAL(networkCLicked(QString)), this, SLOT(onWiFiClicked(QString)));
+    searchNetworks = nullptr;
+}
+
+void WiFiRadioConfig::onWiFiClicked(QString ssid)
+{
+    ui->ssidWiFi->setText(ssid);
+    searchNetworks->close();
+}
 

@@ -175,7 +175,7 @@ void CreateControls(void)
 void displaySetup()
 {
   tft.begin();
-  tft.setRotation(3);
+  tft.setRotation(1);
   tft.setBrightness(255);
 
   lv_init();
@@ -306,7 +306,6 @@ void setup() {
 }
 
 
-  
 
 
 void loop() {

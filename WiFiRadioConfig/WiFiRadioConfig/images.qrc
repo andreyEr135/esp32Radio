@@ -9,5 +9,6 @@
         <file>images/showPasswd.svg</file>
         <file>images/icon.svg</file>
         <file>images/icon.ico</file>
+        <file>images/findWiFi.svg</file>
     </qresource>
 </RCC>
