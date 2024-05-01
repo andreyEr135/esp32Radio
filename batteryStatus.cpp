@@ -31,7 +31,7 @@ float batteryStatus::getBatteryVoltage()
   
   adc_voltage = (adc_value * ref_voltage) / 4096.0; // Определение на входе АЦП
   
-  in_voltage = adc_voltage / (R2/(R1+R2)) + 0.2;         // Расчет напряжения
+  in_voltage = adc_voltage / (R2/(R1+R2)) + 0.2 + 0.3;         // Расчет напряжения
 
   res = in_voltage;
   //char str[10];

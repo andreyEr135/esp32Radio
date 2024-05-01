@@ -85,6 +85,7 @@ void showMainPageAfterWeather()
   reShowNameStationLabel();
   showRadioStationInfo();
   showCurrentRadioStationIcon();
+  reshowCurrentRadioStationIcon();
   reShowTitleInfoLabel();
 
   showPrevBtn();
