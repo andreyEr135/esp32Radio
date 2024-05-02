@@ -6,7 +6,7 @@ void showApTitleLabel()
   lv_style_init(&stApTitleLabelStyle);
   lv_style_set_text_font(&stApTitleLabelStyle, &ubuntu_24);
   lv_obj_t *labelApTitle = lv_label_create(lv_scr_act());
-  lv_label_set_text_fmt(labelApTitle, "Точка доступа создана");
+  lv_label_set_text_fmt(labelApTitle, "Точка доступа создана (конфигурация)");
 
   lv_obj_set_pos(labelApTitle, 90, 44);
   

@@ -244,6 +244,7 @@ bool serverStart()
   writeApName("WiFiRadio");
   writeApPswd("12345678");
   writeApIp(WiFi.softAPIP().toString().c_str());
+  webServerMode = true;
   return true;
 }
 

@@ -88,6 +88,11 @@ extern lv_obj_t *labelPressure;
 extern lv_obj_t *iconHum;
 extern lv_obj_t *labelHum;
 
+// ServerMenu
+extern lv_obj_t *pageServerMenu;
+extern lv_obj_t *labelServerModeTitle;
+extern lv_obj_t *menuOfServersMode;
+
 //AP info
 extern lv_obj_t *labelApName;
 extern lv_obj_t *labelApPswd;

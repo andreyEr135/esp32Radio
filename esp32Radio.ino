@@ -45,12 +45,17 @@
 #include "uiBatteryIcon.h"
 #include "webConfig.h"
 
+#include "uiServerMenuPage.h"
 #include "uiApPage.h"
 #include "uiApTitle.h"
 #include "uiApName.h"
 #include "uiApPswd.h"
 #include "uiApIp.h"
 
+
+#include "otaServer.h"
+#include "uiOtaPage.h"
+#include "uiOtaTitle.h"
 
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t buf[screenWidth * 10];
@@ -166,7 +171,8 @@ void CreateControls(void)
   showBackground();
 
   if (!serverMode) showMainPage();
-  else showApPage();
+  else CreateServerMenu();
+  
   
 
 }
@@ -299,7 +305,8 @@ void setup() {
   else {
     readConfig = new sdConfig();
     CreateControls();
-    serverStart();
+    //serverStart();
+    //serverOtaStart();
 
   }
   
@@ -310,7 +317,10 @@ void setup() {
 
 void loop() {
   lv_timer_handler();  
-  if (serverMode) server->handleClient();
+  //if (serverMode) serverOtaHandle(); //server->handleClient();
+  
+  if (webServerMode) server->handleClient();
+  if (otaServerMode) serverOtaHandle();
 }
 
 //void audio_info(const char *info){

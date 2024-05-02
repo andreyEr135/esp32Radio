@@ -214,6 +214,10 @@ extern void my_touch_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data);
 
 extern int getPosOfCurrentRadio();
 
+// Servers
+extern bool webServerMode;
+extern bool otaServerMode;
+
 
 
 #endif 

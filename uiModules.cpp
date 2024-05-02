@@ -76,6 +76,13 @@ lv_obj_t *labelPressure;
 lv_obj_t *iconHum;
 lv_obj_t *labelHum;
 
+// ServerMenu
+lv_obj_t *pageServerMenu;
+lv_obj_t *labelServerModeTitle;
+lv_obj_t *menuOfServersMode;
+
+
+
 //AP info
 lv_obj_t *labelApName;
 lv_obj_t *labelApPswd;
