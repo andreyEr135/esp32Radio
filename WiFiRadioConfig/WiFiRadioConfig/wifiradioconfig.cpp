@@ -95,8 +95,16 @@ WiFiRadioConfig::WiFiRadioConfig(QWidget *parent)
             } else
             {
                 //qDebug() << reply->readAll();
-                QString message_d = QString("Upload Complete");
-                QMessageBox::information(this, "Upload Complete", message_d);
+                if (reply->readAll().contains("ERROR"))
+                {
+                    QErrorMessage msg(this);
+                    msg.showMessage("Ошибка! Загрузка не произошла");
+                    msg.exec();
+                } else
+                {
+                    QString message_d = QString("Загрузка успешна");
+                    QMessageBox::information(this, "Загрузка успешна", message_d);
+                }
             }
         }
     );

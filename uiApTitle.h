@@ -9,7 +9,7 @@
 #include "globals.h"
 #include "uiModules.h"
 
-extern void showApTitleLabel();
+extern void showApTitleLabel(bool err);
 
 
 #endif 

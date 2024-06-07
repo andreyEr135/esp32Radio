@@ -9,7 +9,8 @@ void batteryStatusDraw()
   LV_IMG_DECLARE(battery_75);
   LV_IMG_DECLARE(battery_100);
   
-  int charge = battery->getBatteryCharge();
+  int charge = 0;
+  if (battery) charge = battery->getBatteryCharge();
 
   iconBattery = lv_img_create(lv_scr_act());
   if ((charge >= 0) && (charge < 15))
@@ -33,7 +34,8 @@ void batteryStatusRedraw()
   LV_IMG_DECLARE(battery_50);
   LV_IMG_DECLARE(battery_75);
   LV_IMG_DECLARE(battery_100);
-  int charge = battery->getBatteryCharge();
+  int charge = 0;
+  if (battery) charge = battery->getBatteryCharge();
 
   if ((charge >= 0) && (charge < 15))
     lv_img_set_src(iconBattery, &battery_0);    

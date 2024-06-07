@@ -8,16 +8,18 @@
 
 //#include "uiModules.h"
 
-void showApPage()
+void showApPage(bool err)
 {
   mainWin = true;
 
-  showApTitleLabel();
+  showApTitleLabel(err);
 
-  showApNameLabel();
+  showApNameLabel(err);
 
-  showApPswdLabel();
-
-  showApIpLabel();
+  if (!err)
+  {
+    showApPswdLabel();
+    showApIpLabel();
+  }
 
 }

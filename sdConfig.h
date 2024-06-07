@@ -40,6 +40,7 @@ class sdConfig
     bool closeFile();
     bool removeFile(String name);
     bool isFileOpened();
+    bool sdCardIsInit();
 
   private:
     bool initSD();

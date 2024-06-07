@@ -166,7 +166,7 @@ void CreateControls(void)
   showBackground();
 
   if (!serverMode) showMainPage();
-  else showApPage();
+  else showApPage(!readConfig->sdCardIsInit());
   
 
 }
@@ -299,8 +299,7 @@ void setup() {
   else {
     readConfig = new sdConfig();
     CreateControls();
-    serverStart();
-
+    if (readConfig->sdCardIsInit()) serverStart(); 
   }
   
 }
@@ -310,7 +309,7 @@ void setup() {
 
 void loop() {
   lv_timer_handler();  
-  if (serverMode) server->handleClient();
+  if (serverMode && (readConfig->sdCardIsInit()) ) server->handleClient();
 }
 
 //void audio_info(const char *info){

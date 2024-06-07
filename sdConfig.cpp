@@ -284,3 +284,8 @@ bool sdConfig::isFileOpened()
 {
   return fileOpened;
 }
+
+bool sdConfig::sdCardIsInit()
+{
+  return sdInited;
+}

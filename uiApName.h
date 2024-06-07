@@ -9,7 +9,7 @@
 #include "globals.h"
 #include "uiModules.h"
 
-extern void showApNameLabel();
+extern void showApNameLabel(bool err);
 extern void writeApName(const char *str);
 
 

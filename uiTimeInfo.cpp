@@ -13,7 +13,8 @@ void showTimeStr()
   lv_style_set_text_color(&stTimeLabelStyle, colour);
 
   labelTime = lv_label_create(lv_scr_act());
-  lv_label_set_text_fmt(labelTime, sTime->getTime().c_str());
+  if (sTime) lv_label_set_text_fmt(labelTime, sTime->getTime().c_str());
+  else lv_label_set_text_fmt(labelTime, "--:--");
   if (mainWin) lv_obj_set_pos(labelTime, 5, 1);
   else  lv_obj_set_pos(labelTime, 178, 3);
   
@@ -22,7 +23,8 @@ void showTimeStr()
 
 void reshowTimeStr()
 {
-  lv_label_set_text_fmt(labelTime, sTime->getTime().c_str());
+  if (sTime) lv_label_set_text_fmt(labelTime, sTime->getTime().c_str());
+  else lv_label_set_text_fmt(labelTime, "--:--");
 }
 
 void reshowTimeInfo()
@@ -37,7 +39,9 @@ void reshowTimeInfo()
   colour.ch.blue  = 0xFF;
   lv_style_set_text_color(&stTimeLabelStyle, colour);
 
-  lv_label_set_text_fmt(labelTime, sTime->getTime().c_str());
+  if (sTime) lv_label_set_text_fmt(labelTime, sTime->getTime().c_str());
+  else lv_label_set_text_fmt(labelTime, "--:--");
+  
   if (mainWin) lv_obj_set_pos(labelTime, 5, 1);
   else  lv_obj_set_pos(labelTime, 178, 3);
   

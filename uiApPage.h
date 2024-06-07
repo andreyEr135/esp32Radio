@@ -9,7 +9,7 @@
 #include "globals.h"
 //#include "uiModules.h"
 
-extern void showApPage();
+extern void showApPage(bool err);
 
 
 #endif 

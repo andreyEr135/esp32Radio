@@ -155,7 +155,7 @@ void handleNotFound(){
 void ReportCouldNotCreateFile(String target)
 {
   SendHTML_Header();
-  webpage += F("<h3>Неудалось создать файл</h3>"); 
+  webpage += F("<h3>ERROR Не удалось создать файл</h3>"); 
   webpage += F("<a href='/"); webpage += target + "'>[Назад]</a><br><br>";
   append_page_footer();
   SendHTML_Content();
@@ -231,8 +231,11 @@ void File_Upload()
 
 bool serverStart()
 {
+  IPAddress Ip(192, 168, 123, 123);
+  IPAddress NMask(255, 255, 255, 0);
+  WiFi.softAPConfig(Ip, Ip, NMask);
   WiFi.softAP("WiFiRadio", "12345678"); //Network and password for the access point genereted by ESP32
-
+  
   server = new ESP32WebServer(80);
   server->on("/", handleRoot);
   server->onNotFound(handleNotFound);
