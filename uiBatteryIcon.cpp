@@ -21,7 +21,7 @@ void batteryStatusDraw()
     lv_img_set_src(iconBattery, &battery_50);    
   else if ((charge >= 60) && (charge < 80))
     lv_img_set_src(iconBattery, &battery_75);    
-  else if ((charge >= 80) && (charge <= 100))
+  else if (charge >= 80)
     lv_img_set_src(iconBattery, &battery_100);    
   
   lv_obj_set_pos(iconBattery, 447, 3);  
@@ -45,7 +45,7 @@ void batteryStatusRedraw()
     lv_img_set_src(iconBattery, &battery_50);    
   else if ((charge >= 60) && (charge < 80))
     lv_img_set_src(iconBattery, &battery_75);    
-  else if ((charge >= 80) && (charge <= 100))
+  else if (charge >= 80)
     lv_img_set_src(iconBattery, &battery_100);   
 
 }
