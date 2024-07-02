@@ -161,10 +161,12 @@ void weather::getweatherFromServer()
       str_copy = str;
       str_copy = str_copy.substring(str_copy.indexOf("humidity")+10);
       
-      if (str_copy.indexOf('}') > 0)
+      if (str_copy.indexOf('}\"') > 0)
       {
-          str_copy = str_copy.substring(0,str_copy.indexOf('}'));
-          humidity = str_copy;
+          str_copy = str_copy.substring(0,str_copy.indexOf('\"'));
+          int hum;
+          sscanf(str_copy.c_str(), "%d", &hum);
+          humidity = (String)hum;
           str_copy = "";
           founded = true;
       }
@@ -179,7 +181,9 @@ void weather::getweatherFromServer()
       if (str_copy.indexOf(',') > 0)
       {
           str_copy = str_copy.substring(0,str_copy.indexOf(','));
-          uptime = str_copy;
+          unsigned long utime;
+          sscanf(uptime.c_str(), "%lu", &utime);
+          uptime = (String)utime;
           
           str_copy = "";
           founded = true;
